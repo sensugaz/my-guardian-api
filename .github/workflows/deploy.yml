@@ -53,5 +53,7 @@ jobs:
           docker pull ${{ steps.build-image.outputs.image }}
           cd ~/my-guardian-api
 
+          MY_GUARDIAN_IMAGE=${{ steps.build-image.outputs.image }}
+
           docker-compose down
           docker-compose up -d
