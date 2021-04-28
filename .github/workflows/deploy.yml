@@ -50,7 +50,7 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
         script: |
-          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker pull docker pull 619803568360.dkr.ecr.ap-southeast-1.amazonaws.com/my-guardian-api:latest
           cd ~/my-guardian-api
           
           docker-compose down
