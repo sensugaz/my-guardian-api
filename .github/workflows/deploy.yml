@@ -41,6 +41,7 @@ jobs:
           envkey_SMTP_USER: ${{ secrets.SMTP_USER }}
           envkey_SMTP_PASS: ${{ secrets.SMTP_PASS }}
           envkey_BASE_URL: ${{ secrets.BASE_URL }}
+          directory: './'
           file_name: .env
 
       - name: Build, tag, and push image to Amazon ECR
@@ -54,6 +55,7 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
+          ls -al
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
