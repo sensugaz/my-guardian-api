@@ -41,7 +41,6 @@ jobs:
           envkey_SMTP_USER: ${{ secrets.SMTP_USER }}
           envkey_SMTP_PASS: ${{ secrets.SMTP_PASS }}
           envkey_BASE_URL: ${{ secrets.BASE_URL }}
-          directory: .
           file_name: .env
 
       - name: Build, tag, and push image to Amazon ECR
