@@ -4,6 +4,7 @@ import * as hbs from 'nodemailer-express-handlebars'
 import { ConfigService } from '@nestjs/config'
 import * as nodemailer from 'nodemailer'
 import { SentMessageInfo } from 'nodemailer'
+import { join } from 'path'
 
 @Injectable()
 export class MailerService {
@@ -37,11 +38,11 @@ export class MailerService {
     this.transporter.use('compile', hbs({
       viewEngine: {
         extName: '.hbs',
-        partialsDir: './libs/mailer/src/lib/templates/',
-        layoutsDir: './libs/mailer/src/lib/templates/',
+        partialsDir: join(__dirname, 'templates'),
+        layoutsDir: join(__dirname, 'templates'),
         defaultLayout: ''
       },
-      viewPath: './libs/mailer/src/lib/templates/',
+      viewPath: join(__dirname, 'templates'),
       extName: '.hbs'
     }))
 

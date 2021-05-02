@@ -29,6 +29,12 @@
       ],
       "@my-guardian-api/mailer/*": [
         "libs/mailer/src/*"
+      ],
+      "@my-guardian-api/auth": [
+        "libs/auth/src"
+      ],
+      "@my-guardian-api/auth/*": [
+        "libs/auth/src/*"
       ]
     }
   }

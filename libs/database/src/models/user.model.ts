@@ -3,6 +3,7 @@ import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { UserTokenModel } from '@my-guardian-api/database/models/user-token.model'
 import { ApiHideProperty } from '@nestjs/swagger'
 import { RoleModel } from '@my-guardian-api/database/models/role.model'
+import { ApiException } from '@my-guardian-api/common'
 
 @Entity('users')
 @Unique(['email'])
@@ -44,5 +45,23 @@ export class UserModel extends BaseModel {
     }
 
     this.tokens.push(token)
+  }
+
+  activate() {
+    if (this.isActivate) {
+      throw new ApiException({
+        module: 'common',
+        type: 'domain',
+        codes: ['user_already_activated'],
+        statusCode: 400
+      })
+    }
+
+    this.isActivate = true
+  }
+
+  changePassword(password: string, salt: string) {
+    this.password = password
+    this.salt = salt
   }
 }
