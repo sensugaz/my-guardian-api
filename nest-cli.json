@@ -28,10 +28,29 @@
       "compilerOptions": {
         "tsConfigPath": "libs/mailer/tsconfig.lib.json"
       }
+    },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
     }
+  },
+  "generateOptions": {
+    "spec": false
   },
   "compilerOptions": {
     "webpack": false,
+    "assets": [
+      {
+        "include": "../libs/mailer/src/templates/*.hbs",
+        "outDir": "dist/libs/",
+        "watchAssets": true
+      }
+    ],
     "plugins": [
       {
         "name": "@nestjs/swagger/plugin",
