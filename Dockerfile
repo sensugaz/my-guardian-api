@@ -17,6 +17,7 @@ COPY package*.json ./
 RUN npm install --only=production
 COPY . .
 COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /usr/src/app/.env /.dist
 
 EXPOSE 3000 3000
 
