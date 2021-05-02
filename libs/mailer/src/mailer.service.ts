@@ -6,7 +6,7 @@ import * as nodemailer from 'nodemailer'
 import { SentMessageInfo } from 'nodemailer'
 
 @Injectable()
-export class MailSenderService {
+export class MailerService {
   private transporter: Mail
 
   constructor(private readonly configService: ConfigService) {
@@ -37,11 +37,11 @@ export class MailSenderService {
     this.transporter.use('compile', hbs({
       viewEngine: {
         extName: '.hbs',
-        partialsDir: './libs/mail-sender/src/lib/templates/',
-        layoutsDir: './libs/mail-sender/src/lib/templates/',
+        partialsDir: './libs/mailer/src/lib/templates/',
+        layoutsDir: './libs/mailer/src/lib/templates/',
         defaultLayout: ''
       },
-      viewPath: './libs/mail-sender/src/lib/templates/',
+      viewPath: './libs/mailer/src/lib/templates/',
       extName: '.hbs'
     }))
 

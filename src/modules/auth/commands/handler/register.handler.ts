@@ -6,10 +6,14 @@ import { ApiException, RoleEnum, TokenTypeEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 import { uid } from 'rand-token'
 import * as bcrypt from 'bcrypt'
+import { ConfigService } from '@nestjs/config'
+import { MailerService } from '@my-guardian-api/mailer'
 
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
-  constructor(private readonly entityManager: EntityManager) {
+  constructor(private readonly entityManager: EntityManager,
+              private readonly configService: ConfigService,
+              private readonly mailerService: MailerService) {
   }
 
   async execute({ body }: RegisterCommand): Promise<UserModel> {
@@ -68,6 +72,10 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     })
 
     await this.entityManager.save(CustomerModel, customerModel)
+
+    await this.mailerService.sendWithTemplate(user.email, 'Confirmation d’inscription', {
+      url: `${this.configService.get<string>('BASE_URL')}/auth/redirect?type=register&token=${tokenModel.token}`
+    }, 'register')
 
     delete user.password
     delete user.salt
