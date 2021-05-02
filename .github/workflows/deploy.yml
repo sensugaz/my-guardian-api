@@ -55,3 +55,4 @@ jobs:
 
           docker-compose down
           MY_GUARDIAN_IMAGE=${{ steps.build-image.outputs.image }} docker-compose up -d
+          docker rmi ${{ steps.build-image.outputs.image }}
