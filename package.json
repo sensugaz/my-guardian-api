@@ -97,7 +97,9 @@
       "@my-guardian-api/database/(.*)": "<rootDir>/libs/database/src/$1",
       "@my-guardian-api/database": "<rootDir>/libs/database/src",
       "@my-guardian-api/common/(.*)": "<rootDir>/libs/common/src/$1",
-      "@my-guardian-api/common": "<rootDir>/libs/common/src"
+      "@my-guardian-api/common": "<rootDir>/libs/common/src",
+      "@my-guardian-api/mailsender/(.*)": "<rootDir>/libs/mailsender/src/$1",
+      "@my-guardian-api/mailsender": "<rootDir>/libs/mailsender/src"
     }
   }
 }

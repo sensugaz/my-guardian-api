@@ -23,6 +23,12 @@
       ],
       "@my-guardian-api/common/*": [
         "libs/common/src/*"
+      ],
+      "@my-guardian-api/mailsender": [
+        "libs/mailsender/src"
+      ],
+      "@my-guardian-api/mailsender/*": [
+        "libs/mailsender/src/*"
       ]
     }
   }
