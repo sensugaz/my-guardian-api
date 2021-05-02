@@ -19,6 +19,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "mailsender": {
+      "type": "library",
+      "root": "libs/mailsender",
+      "entryFile": "index",
+      "sourceRoot": "libs/mailsender/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/mailsender/tsconfig.lib.json"
+      }
     }
   },
   "compilerOptions": {
