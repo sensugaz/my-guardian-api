@@ -18,7 +18,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
       type: TokenTypeEnum.FORGOT_PASSWORD
     }, {
       order: {
-        createDate: 'ASC'
+        createdDate: 'ASC'
       },
       relations: ['user']
     })

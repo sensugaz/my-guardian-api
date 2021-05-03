@@ -41,7 +41,7 @@ import { RolesGuard } from '@my-guardian-api/auth'
 import { Roles } from '@my-guardian-api/auth/decorators'
 import { ApiException, RoleEnum } from '@my-guardian-api/common'
 
-@ApiTags('/users')
+@ApiTags('users')
 @Controller('/users')
 export class UserController {
   constructor(private readonly commandBus: CommandBus,

@@ -21,7 +21,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
       email: body.email
     }, {
       order: {
-        createDate: 'DESC'
+        createdDate: 'DESC'
       },
       relations: ['tokens']
     })

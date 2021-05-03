@@ -8,13 +8,13 @@ export class BaseModel {
     type: 'timestamp without time zone',
     name: 'created_date'
   })
-  createDate: Date
+  createdDate: Date
 
   @UpdateDateColumn({
     type: 'timestamp without time zone',
     name: 'updated_date'
   })
-  updateDate: Date
+  updatedDate: Date
 
   @DeleteDateColumn({
     type: 'timestamp without time zone',
