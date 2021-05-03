@@ -3,6 +3,7 @@ import { CommonModule } from '@my-guardian-api/common'
 import { DatabaseModule } from '@my-guardian-api/database'
 import { CustomerController } from './controllers'
 import { QueryHandlers } from './queries'
+import { CommandHandlers } from './commands'
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { QueryHandlers } from './queries'
     CustomerController
   ],
   providers: [
-    ...QueryHandlers
+    ...QueryHandlers,
+    ...CommandHandlers
   ]
 })
 export class CustomerModule {

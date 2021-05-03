@@ -1,5 +1,6 @@
-import { GetCustomerHandler } from './handler'
+import { GetCustomerByIdHandler, GetCustomerHandler } from './handler'
 
 export const QueryHandlers = [
-  GetCustomerHandler
+  GetCustomerHandler,
+  GetCustomerByIdHandler
 ]
