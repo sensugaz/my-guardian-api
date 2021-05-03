@@ -43,19 +43,19 @@ jobs:
           envkey_BASE_URL: ${{ secrets.BASE_URL }}
           directory: './'
           file_name: .env
-        run:
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: my-guardian-api
+          #        IMAGE_TAG: latest
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
           echo ${{ steps.login-ecr.outputs }}
-#      - name: Build, tag, and push image to Amazon ECR
-#        id: build-image
-#        env:
-#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#          ECR_REPOSITORY: my-guardian-api
-#          #        IMAGE_TAG: latest
-#          IMAGE_TAG: ${{ github.sha }}
-#        run: |
-#          # Build a docker container and
-#          # push it to ECR so that it can
-#          # be deployed to ECS.
 #          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 #          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 #          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
