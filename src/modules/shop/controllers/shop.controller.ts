@@ -1,11 +1,11 @@
 import { ApiTags } from '@nestjs/swagger'
 import { Controller, Get } from '@nestjs/common'
 
-@ApiTags('shop')
-@Controller('/shop')
+@ApiTags('shops')
+@Controller('/shops')
 export class ShopController {
   @Get()
   index() {
-    
+
   }
 }
