@@ -30,6 +30,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       })
     }
 
+    console.log(user)
+
     const accessToken = await this.jwtService.sign({
       id: user.id,
       role: {

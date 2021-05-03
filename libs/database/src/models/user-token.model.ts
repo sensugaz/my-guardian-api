@@ -3,6 +3,7 @@ import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { UserModel } from '@my-guardian-api/database/models/user.model'
 import { ApiHideProperty } from '@nestjs/swagger'
 import { ApiException } from '@my-guardian-api/common'
+import * as moment from 'moment'
 
 @Entity('user_tokens')
 @Unique(['token'])
@@ -12,20 +13,20 @@ export class UserTokenModel extends BaseModel {
 
   @Column({
     type: 'timestamp',
-    name: 'expired_at',
+    name: 'expired_date',
     nullable: true
   })
-  expiredAt: Date
+  expiredDate: Date
 
   @Column()
   type: string
 
   @Column({
     type: 'boolean',
-    name: 'is_used',
+    name: 'used',
     default: false
   })
-  isUsed: boolean
+  used: boolean
 
   @ApiHideProperty()
   @ManyToOne(() => UserModel, x => x.tokens)
@@ -35,7 +36,13 @@ export class UserTokenModel extends BaseModel {
   user: UserModel
 
   usedToken() {
-    if (this.isUsed) {
+    this.isUsed()
+
+    this.used = true
+  }
+
+  isUsed() {
+    if (this.used) {
       throw new ApiException({
         module: 'common',
         type: 'domain',
@@ -43,7 +50,22 @@ export class UserTokenModel extends BaseModel {
         statusCode: 400
       })
     }
+  }
 
-    this.isUsed = true
+  isExpired() {
+    if (this.expiredDate) {
+      const isExpired = moment(this.expiredDate).diff(moment().utc(), 'seconds') <= 0
+
+      if (isExpired) {
+        throw new ApiException({
+          module: 'common',
+          type: 'application',
+          codes: ['token_is_expired'],
+          statusCode: 400
+        })
+      }
+    }
+
+    return false
   }
 }

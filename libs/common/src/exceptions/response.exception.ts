@@ -18,7 +18,7 @@ export class ResponseException {
     this.requestId = requestId
     this.ip = ip.address()
     this.host = os.hostname()
-    this.system = 'moto-api'
+    this.system = 'my-guardian-api'
     this.module = module
     this.type = type
     this.actionType = actionType

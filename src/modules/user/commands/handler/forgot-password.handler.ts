@@ -38,7 +38,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
     const tokenEntity = this.entityManager.create(UserTokenModel, {
       token: uid(100),
       type: TokenTypeEnum.FORGOT_PASSWORD,
-      expiredAt: moment().utc().add(30, 'minute').toDate()
+      expiredDate: moment().utc().add(30, 'minute').toDate()
     })
 
     user.addToken(tokenEntity)

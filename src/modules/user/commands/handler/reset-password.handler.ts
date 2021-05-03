@@ -5,7 +5,6 @@ import { EntityManager } from 'typeorm'
 import { UserTokenModel } from '@my-guardian-api/database'
 import { ApiException, TokenTypeEnum } from '@my-guardian-api/common'
 import * as bcrypt from 'bcrypt'
-import * as  moment from 'moment'
 
 @CommandHandler(ResetPasswordCommand)
 export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand> {
@@ -48,16 +47,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
     token.usedToken()
     token.user.changePassword(password, salt)
 
-    const isExpired = moment(token.expiredAt).diff(moment().utc(), 'seconds') <= 0
-
-    if (isExpired) {
-      throw new ApiException({
-        module: 'user',
-        type: 'application',
-        codes: ['token_is_expired'],
-        statusCode: 400
-      })
-    }
+    token.isExpired()
 
     await this.entityManager.save(token)
     await this.entityManager.save(token.user)
