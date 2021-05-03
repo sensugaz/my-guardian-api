@@ -30,4 +30,11 @@ export class CustomerModel extends BaseModel {
     name: 'phone_number'
   })
   phoneNumber: string
+  
+  updateProfile(profile: { firstName: string, lastName: string, phoneCode: string, phoneNumber: string, isVerify?: boolean }) {
+    this.firstName = profile?.firstName
+    this.lastName = profile?.lastName
+    this.phoneCode = profile?.phoneCode
+    this.phoneNumber = profile?.phoneNumber
+  }
 }

@@ -31,7 +31,7 @@ export class UserModel extends BaseModel {
   tokens: UserTokenModel[]
 
   @ManyToOne(() => RoleModel, x => x.user, {
-    cascade: true,
+    cascade: ['insert', 'update'],
     eager: true
   })
   @JoinColumn({
