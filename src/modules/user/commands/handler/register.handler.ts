@@ -42,7 +42,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     if (!role) {
       throw new ApiException({
         type: 'application',
-        module: 'auth',
+        module: 'user',
         codes: ['role_not_found'],
         statusCode: HttpStatus.BAD_REQUEST
       })
@@ -51,7 +51,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     const salt = await bcrypt.genSalt(15)
     const password = await bcrypt.hash(body.password, salt)
 
-    const userModel = await this.entityManager.create(UserModel, {
+    const userModel = this.entityManager.create(UserModel, {
       email: body.email,
       password: password,
       salt: salt,
@@ -63,7 +63,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 
     const user = await this.entityManager.save(UserModel, userModel)
 
-    const customerModel = await this.entityManager.create(CustomerModel, {
+    const customerModel = this.entityManager.create(CustomerModel, {
       userId: user.id,
       firstName: body.firstName,
       lastName: body.lastName,
