@@ -2,27 +2,17 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { ShopModel } from '@my-guardian-api/database/models/shop.model'
 
-@Entity('shop_schedules')
-export class ShopScheduleModel extends BaseModel {
+@Entity('shop_prices')
+export class ShopPriceModel extends BaseModel {
   @Column()
-  day: string
+  name: string
 
   @Column({
-    nullable: true,
-    name: 'open_time'
+    type: 'decimal',
+    precision: 6,
+    scale: 2
   })
-  openTime: string
-
-  @Column({
-    nullable: true,
-    name: 'close_time'
-  })
-  closeTime: string
-
-  @Column({
-    name: 'is_close'
-  })
-  isClose: boolean
+  price: number
 
   @ManyToOne(() => ShopModel, x => x.schedules)
   @JoinColumn({

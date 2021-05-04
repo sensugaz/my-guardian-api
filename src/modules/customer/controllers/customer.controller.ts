@@ -34,22 +34,22 @@ export class CustomerController {
     }))
   }
 
-  @Get(':id')
+  @Get(':userId')
   @ApiParam({
-    name: 'id',
+    name: 'userId',
     required: this
   })
-  getCustomerById(@Param('id') userId: string): Promise<UserModel> {
+  getCustomerById(@Param('userId') userId: string): Promise<UserModel> {
     return this.queryBus.execute(new GetCustomerByIdQuery(userId))
   }
 
-  @Delete(':id')
+  @Delete(':userId')
   @ApiParam({
-    name: 'id',
+    name: 'userId',
     required: this
   })
   @HttpCode(HttpStatus.OK)
-  deleteCustomer(@Param('id') userId: string): Promise<UserModel> {
+  deleteCustomer(@Param('userId') userId: string): Promise<UserModel> {
     return this.commandBus.execute(new DeleteCustomerCommand(userId))
   }
 }
