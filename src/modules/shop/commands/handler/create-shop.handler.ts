@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CreateShopCommand } from '../command'
 import { EntityManager } from 'typeorm'
-import { RoleModel, ShopModel, ShopPriceModel, ShopScheduleModel, UserModel } from '@my-guardian-api/database'
+import { RoleModel, ShopModel, UserModel } from '@my-guardian-api/database'
 import { ApiException, RoleEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
@@ -53,34 +53,11 @@ export class CreateShopHandler implements ICommandHandler<CreateShopCommand> {
 
     const shopModel = this.entityManager.create(ShopModel, {
       userId: user.id,
-      name: body.name,
-      address: body.address,
-      geolocation: body.geolocation,
-      available: body.available
+      available: 0
     })
 
-    for (const schedule of body.schedules) {
-      const scheduleModel = this.entityManager.create(ShopScheduleModel, {
-        day: schedule.day,
-        openTime: !schedule.isClose ? schedule.openTime : null,
-        closeTime: !schedule.isClose ? schedule.closeTime : null,
-        isClose: schedule.isClose
-      })
-
-      shopModel.addSchedule(scheduleModel)
-    }
-
-    for (const price of body.prices) {
-      const priceModel = this.entityManager.create(ShopPriceModel, {
-        name: price.name,
-        price: price.price
-      })
-
-      shopModel.addPrice(priceModel)
-    }
-
     user['profile'] = await this.entityManager.save(ShopModel, shopModel)
-    
+
     delete user.password
     delete user.salt
 

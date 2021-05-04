@@ -11,16 +11,20 @@ export class ShopModel extends BaseModel {
   })
   userId: string
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   name: string
 
   @Column({
-    type: 'text'
+    type: 'text',
+    nullable: true
   })
   address: string
 
   @Column({
-    type: 'jsonb'
+    type: 'jsonb',
+    nullable: true
   })
   geolocation: {
     lat: string,
