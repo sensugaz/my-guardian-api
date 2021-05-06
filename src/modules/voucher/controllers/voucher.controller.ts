@@ -32,6 +32,7 @@ export class VoucherController {
     name: 'id',
     required: this
   })
+  @Roles(RoleEnum.ADMIN)
   @HttpCode(HttpStatus.OK)
   updateVoucher(@Param('id') id: string, @Body() body: UpdateVoucherDto): Promise<VoucherModel> {
     return this.commandBus.execute(new UpdateVoucherCommand(id, body))
@@ -42,6 +43,7 @@ export class VoucherController {
     name: 'id',
     required: this
   })
+  @Roles(RoleEnum.ADMIN)
   @HttpCode(HttpStatus.OK)
   deleteVoucher(@Param('id') id: string): Promise<VoucherModel> {
     return this.commandBus.execute(new DeleteVoucherCommand(id))
@@ -53,8 +55,9 @@ export class VoucherController {
     name: 'query',
     required: false
   })
-  getShop(@Query('query') query: string,
-          @Query() param: PaginationDto): Promise<Pagination<VoucherModel>> {
+  @Roles(RoleEnum.ADMIN)
+  getVoucher(@Query('query') query: string,
+             @Query() param: PaginationDto): Promise<Pagination<VoucherModel>> {
     const { page, limit, sort, orderBy } = param
     return this.queryBus.execute(new GetVoucherQuery(query, sort, orderBy, {
       page: page ? page : 1,
@@ -67,7 +70,8 @@ export class VoucherController {
     name: 'id',
     required: this
   })
-  getVoucher(@Param('id') id: string): Promise<VoucherModel> {
+  @Roles(RoleEnum.ADMIN)
+  getVoucherById(@Param('id') id: string): Promise<VoucherModel> {
     return this.queryBus.execute(new GetVoucherByIdQuery(id))
   }
 

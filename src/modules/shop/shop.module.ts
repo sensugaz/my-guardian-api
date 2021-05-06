@@ -4,11 +4,13 @@ import { DatabaseModule } from '@my-guardian-api/database'
 import { ShopController } from './controllers'
 import { CommandHandlers } from './commands'
 import { QueryHandlers } from './queries'
+import { GoogleMapModule } from '@my-guardian-api/google-map'
 
 @Module({
   imports: [
     CommonModule,
-    DatabaseModule
+    DatabaseModule,
+    GoogleMapModule
   ],
   controllers: [
     ShopController

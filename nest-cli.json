@@ -37,6 +37,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/auth/tsconfig.lib.json"
       }
+    },
+    "google-map": {
+      "type": "library",
+      "root": "libs/google-map",
+      "entryFile": "index",
+      "sourceRoot": "libs/google-map/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/google-map/tsconfig.lib.json"
+      }
     }
   },
   "generateOptions": {

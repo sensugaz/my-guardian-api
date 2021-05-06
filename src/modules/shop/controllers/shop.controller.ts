@@ -1,15 +1,15 @@
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { UserModel } from '@my-guardian-api/database'
+import { ShopModel, UserModel } from '@my-guardian-api/database'
 import { CreateShopCommand, DeleteShopCommand, UpdateShopCommand } from '../commands/command'
 import { PaginationDto, RoleEnum } from '@my-guardian-api/common'
 import { Roles } from '@my-guardian-api/auth/decorators'
-import { CreateShopDto, UpdateShopDto } from '../dtos'
+import { CreateShopDto, SearchDto, UpdateShopDto } from '../dtos'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Pagination } from 'nestjs-typeorm-paginate'
-import { GetShopByIdQuery, GetShopQuery } from '../queries/query'
+import { GetShopByIdQuery, GetShopQuery, SearchShopQuery } from '../queries/query'
 
 @ApiTags('shops')
 @Controller('/shops')
@@ -70,5 +70,10 @@ export class ShopController {
   @HttpCode(HttpStatus.OK)
   deleteShop(@Param('userId') userId: string): Promise<UserModel> {
     return this.commandBus.execute(new DeleteShopCommand(userId))
+  }
+
+  @Post('search')
+  searchShop(@Body() body: SearchDto): Promise<ShopModel[]> {
+    return this.queryBus.execute(new SearchShopQuery(body))
   }
 }
