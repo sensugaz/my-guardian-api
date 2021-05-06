@@ -102,7 +102,9 @@
       "@my-guardian-api/mailer/(.*)": "<rootDir>/libs/mailer/src/$1",
       "@my-guardian-api/mailer": "<rootDir>/libs/mailer/src",
       "@my-guardian-api/authenticate/(.*)": "<rootDir>/libs/authenticate/src/$1",
-      "@my-guardian-api/authenticate": "<rootDir>/libs/authenticate/src"
+      "@my-guardian-api/authenticate": "<rootDir>/libs/authenticate/src",
+      "@my-guardian-api/google-map/(.*)": "<rootDir>/libs/google-map/src/$1",
+      "@my-guardian-api/google-map": "<rootDir>/libs/google-map/src"
     }
   }
 }
