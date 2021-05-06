@@ -68,9 +68,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             docker login -u AWS -p $(aws ecr get-login-password) ${{ steps.login-ecr.outputs.registry }}
-
             docker pull ${{ steps.build-image.outputs.image }}
             cd ~/my-guardian-api
-
             docker-compose down
             MY_GUARDIAN_IMAGE=${{ steps.build-image.outputs.image }} docker-compose up -d
