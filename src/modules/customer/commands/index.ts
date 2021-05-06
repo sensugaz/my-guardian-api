@@ -1,5 +1,6 @@
-import { DeleteCustomerHandler } from './handler'
+import { DeleteCustomerHandler, UpdateCustomerHandler } from './handler'
 
 export const CommandHandlers = [
-  DeleteCustomerHandler
+  DeleteCustomerHandler,
+  UpdateCustomerHandler
 ]

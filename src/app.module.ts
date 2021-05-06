@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common'
-import { CustomerModule, ShopModule, UserModule } from './modules'
+import { CustomerModule, ShopModule, UserModule, VoucherModule } from './modules'
 
 @Module({
   imports: [
     UserModule,
     ShopModule,
-    CustomerModule
+    CustomerModule,
+    VoucherModule
   ],
   providers: []
 })
