@@ -45,7 +45,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
     await this.entityManager.save(UserModel, user)
 
     await this.mailerService.sendWithTemplate(user.email, 'Demande de réinitialisation du mot de passe', {
-      url: `${this.configService.get<string>('BASE_URL')}/auth/redirect?type=forgot-password&token=${tokenEntity.token}`
+      url: `${this.configService.get<string>('BASE_URL')}/users/redirect?type=forgot-password&token=${tokenEntity.token}`
     }, 'forgot-password')
 
     delete user.password
