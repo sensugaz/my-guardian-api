@@ -74,7 +74,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     await this.entityManager.save(CustomerModel, customerModel)
 
     await this.mailerService.sendWithTemplate(user.email, 'Confirmation d’inscription', {
-      url: `${this.configService.get<string>('BASE_URL')}/auth/redirect?type=register&token=${tokenModel.token}`
+      url: `${this.configService.get<string>('BASE_URL')}/users/redirect?type=register&token=${tokenModel.token}`
     }, 'register')
 
     delete user.password
