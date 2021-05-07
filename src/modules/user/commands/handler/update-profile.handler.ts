@@ -32,6 +32,8 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfileComman
 
     await this.entityManager.save(customer)
 
+    user['profile'] = customer
+    
     delete user.password
     delete user.salt
 
