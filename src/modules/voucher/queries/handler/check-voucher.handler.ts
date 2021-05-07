@@ -12,7 +12,7 @@ export class CheckVoucherHandler implements IQueryHandler<CheckVoucherQuery> {
 
   async execute(query: CheckVoucherQuery): Promise<VoucherModel> {
     const voucher = await this.entityManager.findOne(VoucherModel, {
-      code: query.code
+      code: query.code.toLocaleUpperCase()
     }, {
       order: {
         createdDate: OrderByEnum.DESC

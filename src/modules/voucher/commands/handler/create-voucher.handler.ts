@@ -12,7 +12,7 @@ export class CreateVoucherHandler implements ICommandHandler<CreateVoucherComman
 
   async execute({ body }: CreateVoucherCommand): Promise<VoucherModel> {
     const voucherModel = this.entityManager.create(VoucherModel, {
-      code: body.code,
+      code: body.code.toLocaleUpperCase(),
       name: body.name,
       description: body.description,
       percent: body.percent
@@ -22,7 +22,7 @@ export class CreateVoucherHandler implements ICommandHandler<CreateVoucherComman
       code: body.code
     })
 
-    if (!codeExists) {
+    if (codeExists) {
       throw new ApiException({
         type: 'application',
         module: 'voucher',
