@@ -34,6 +34,12 @@ export class ShopModel extends BaseModel {
   @Column()
   available: number
 
+  @Column({
+    type: 'text',
+    nullable: true
+  })
+  description: string
+
   @OneToMany(() => ShopScheduleModel, x => x.shop, {
     cascade: true,
     eager: true

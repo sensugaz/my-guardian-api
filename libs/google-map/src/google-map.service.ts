@@ -22,11 +22,12 @@ export class GoogleMapService {
     if (data.status === 'OK') {
       for (const row of data.rows) {
         for (const element of row.elements) {
+          console.log(element)
           distance += element.distance?.value
         }
       }
     }
-    
+
     return distance
   }
 }
