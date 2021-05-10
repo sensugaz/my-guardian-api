@@ -44,7 +44,13 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
       available: body.available
     })
 
-    await this.entityManager.remove([...shop.schedules, ...shop.prices])
+    for (const schedule of shop.schedules) {
+      await this.entityManager.remove(schedule)
+    }
+
+    for (const price of shop.prices) {
+      await this.entityManager.remove(price)
+    }
 
     for (const schedule of body.schedules) {
       const scheduleModel = this.entityManager.create(ShopScheduleModel, {
@@ -67,14 +73,6 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
     }
 
     shop = await this.entityManager.save(shop)
-
-    await this.entityManager.delete(ShopScheduleModel, {
-      shop: null
-    })
-
-    await this.entityManager.delete(ShopPriceModel, {
-      shop: null
-    })
 
     user['profile'] = shop
 
