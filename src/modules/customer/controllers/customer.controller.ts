@@ -1,14 +1,15 @@
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common'
 import { PaginationDto, RoleEnum } from '@my-guardian-api/common'
 import { UserModel } from '@my-guardian-api/database'
 import { Pagination } from 'nestjs-typeorm-paginate'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { GetCustomerByIdQuery, GetCustomerQuery } from '../queries/query'
-import { DeleteCustomerCommand } from '../commands/command'
+import { CreateCustomerCommand, DeleteCustomerCommand } from '../commands/command'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { AuthGuard } from '@nestjs/passport'
 import { Roles } from '@my-guardian-api/auth/decorators'
+import { CreateCustomerDto } from '../dtos'
 
 @ApiTags('customers')
 @Controller('/customers')
@@ -18,6 +19,11 @@ import { Roles } from '@my-guardian-api/auth/decorators'
 export class CustomerController {
   constructor(private readonly commandBus: CommandBus,
               private readonly queryBus: QueryBus) {
+  }
+
+  @Post()
+  createCustomer(@Body() body: CreateCustomerDto): Promise<UserModel> {
+    return this.commandBus.execute(new CreateCustomerCommand(body))
   }
 
   @Get()
