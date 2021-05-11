@@ -41,6 +41,7 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
       name: body.name,
       address: body.address,
       geolocation: body.geolocation,
+      description: body.description,
       available: body.available
     })
 
