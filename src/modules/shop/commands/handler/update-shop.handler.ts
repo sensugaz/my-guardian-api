@@ -44,13 +44,17 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
       available: body.available
     })
 
-    for (const schedule of shop.schedules) {
-      await this.entityManager.remove(schedule)
-    }
+    shop.schedules = []
+    shop.prices = []
 
-    for (const price of shop.prices) {
-      await this.entityManager.remove(price)
-    }
+    shop = await this.entityManager.save(shop)
+
+    await this.entityManager.delete(ShopPriceModel, {
+      shop: null
+    })
+    await this.entityManager.delete(ShopScheduleModel, {
+      shop: null
+    })
 
     for (const schedule of body.schedules) {
       const scheduleModel = this.entityManager.create(ShopScheduleModel, {
