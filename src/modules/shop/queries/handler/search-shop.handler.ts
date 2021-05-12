@@ -16,13 +16,15 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
     const shopInArea: ShopModel[] = []
 
     for (const shop of shops) {
-      const distance = await this.googleMapService.distance(body.geolocation, shop.geolocation)
+      if (shop?.geolocation?.lat && shop?.geolocation?.lng) {
+        const distance = await this.googleMapService.distance(body.geolocation, shop.geolocation)
 
-      if (distance >= 0) {
-        const km = Math.ceil(distance / 1000)
+        if (distance >= 0) {
+          const km = Math.ceil(distance / 1000)
 
-        if (km < (config?.searchRadius || 10)) {
-          shopInArea.push(shop)
+          if (km < (config?.searchRadius || 10)) {
+            shopInArea.push(shop)
+          }
         }
       }
     }

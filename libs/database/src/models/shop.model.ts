@@ -68,11 +68,12 @@ export class ShopModel extends BaseModel {
     this.prices.push(price)
   }
 
-  updateProfile(profile: { name: string, address: string, geolocation: any, available: number }) {
+  updateProfile(profile: { name: string, address: string, geolocation: any, available: number, description: string }) {
     this.name = profile.name
     this.address = profile.address
     this.geolocation = profile.geolocation
     this.available = profile.available
+    this.description = profile.description
   }
 
   clearSchedules() {
