@@ -22,7 +22,7 @@ export class CheckTokenHandler implements IQueryHandler<CheckTokenQuery> {
         statusCode: 400
       })
     }
-
+    
     token.isUsed()
     token.isExpired()
 

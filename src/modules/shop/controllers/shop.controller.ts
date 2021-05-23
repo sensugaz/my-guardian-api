@@ -73,6 +73,7 @@ export class ShopController {
   }
 
   @Post('search')
+  @HttpCode(HttpStatus.OK)
   searchShop(@Body() body: SearchDto): Promise<ShopModel[]> {
     return this.queryBus.execute(new SearchShopQuery(body))
   }

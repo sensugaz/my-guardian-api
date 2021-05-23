@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
-import { VoucherModel } from '@my-guardian-api/database'
+import { VoucherHistoryModel, VoucherModel } from '@my-guardian-api/database'
 import { EntityManager } from 'typeorm'
 import { ApiException, OrderByEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
@@ -24,6 +24,20 @@ export class CheckVoucherHandler implements IQueryHandler<CheckVoucherQuery> {
         type: 'application',
         module: 'voucher',
         codes: ['voucher_not_found'],
+        statusCode: HttpStatus.BAD_REQUEST
+      })
+    }
+
+    const history = await this.entityManager.findOne(VoucherHistoryModel, {
+      user: query.user,
+      code: query.code
+    })
+
+    if (history) {
+      throw new ApiException({
+        type: 'application',
+        module: 'voucher',
+        codes: ['voucher_has_been_used'],
         statusCode: HttpStatus.BAD_REQUEST
       })
     }

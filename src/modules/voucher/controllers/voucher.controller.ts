@@ -1,5 +1,18 @@
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards
+} from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { Roles } from '@my-guardian-api/auth/decorators'
 import { PaginationDto, RoleEnum } from '@my-guardian-api/common'
@@ -80,7 +93,7 @@ export class VoucherController {
     name: 'code',
     required: this
   })
-  checkVoucher(@Param('code') code: string): Promise<VoucherModel> {
-    return this.queryBus.execute(new CheckVoucherQuery(code))
+  checkVoucher(@Req() req, @Param('code') code: string): Promise<VoucherModel> {
+    return this.queryBus.execute(new CheckVoucherQuery(req.user, code))
   }
 }
