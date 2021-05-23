@@ -20,9 +20,10 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
         const distance = await this.googleMapService.distance(body.geolocation, shop.geolocation)
 
         if (distance >= 0) {
-          const km = Math.ceil(distance / 1000)
+          const km = distance / 1000
 
           if (km < (config?.searchRadius || 10)) {
+            shop['distance'] = Number(km.toFixed(2))
             shopInArea.push(shop)
           }
         }

@@ -4,6 +4,7 @@ import { UserTokenModel } from '@my-guardian-api/database/models/user-token.mode
 import { ApiHideProperty } from '@nestjs/swagger'
 import { RoleModel } from '@my-guardian-api/database/models/role.model'
 import { ApiException } from '@my-guardian-api/common'
+import { VoucherHistoryModel } from '@my-guardian-api/database/models/voucher-history.model'
 
 @Entity('users')
 @Unique(['email'])
@@ -38,6 +39,12 @@ export class UserModel extends BaseModel {
     name: 'role_id'
   })
   role: RoleModel
+
+  @ApiHideProperty()
+  @OneToMany(() => VoucherHistoryModel, x => x.user, {
+    cascade: true
+  })
+  vouchers: VoucherHistoryModel[]
 
   addToken(token: UserTokenModel) {
     if (!this.tokens) {
