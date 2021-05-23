@@ -7,24 +7,24 @@ import { ShopPriceModel } from '@my-guardian-api/database/models/shop-price.mode
 export class ShopModel extends BaseModel {
   @Column({
     type: 'uuid',
-    name: 'user_id',
+    name: 'user_id'
   })
   userId: string
 
   @Column({
-    nullable: true,
+    nullable: true
   })
   name: string
 
   @Column({
     type: 'text',
-    nullable: true,
+    nullable: true
   })
   address: string
 
   @Column({
     type: 'jsonb',
-    nullable: true,
+    nullable: true
   })
   geolocation: {
     lat: string
@@ -36,23 +36,23 @@ export class ShopModel extends BaseModel {
 
   @Column({
     type: 'text',
-    nullable: true,
+    nullable: true
   })
   description: string
 
   @OneToMany(() => ShopScheduleModel, (x) => x.shop, {
     cascade: true,
-    eager: true,
+    eager: true
   })
   schedules: ShopScheduleModel[]
 
   @OneToMany(() => ShopPriceModel, (x) => x.shop, {
     cascade: true,
-    eager: true,
+    eager: true
   })
   prices: ShopPriceModel[]
 
-  distanceFromSeach?: number
+  distance: number
 
   addSchedule(schedule: ShopScheduleModel) {
     if (!this.schedules) {
@@ -92,7 +92,7 @@ export class ShopModel extends BaseModel {
     this.prices = []
   }
 
-  setDistanceFromSearch(distance: number) {
-    this.distanceFromSeach = distance
+  setDistance(d: number) {
+    this.distance = d
   }
 }
