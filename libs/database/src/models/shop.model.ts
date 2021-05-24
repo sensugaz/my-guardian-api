@@ -92,7 +92,8 @@ export class ShopModel extends BaseModel {
     this.prices = []
   }
 
-  setDistance(d: number) {
-    this.distance = d
-  }
+  //
+  // setDistance(d: number) {
+  //   this.distance = d
+  // }
 }

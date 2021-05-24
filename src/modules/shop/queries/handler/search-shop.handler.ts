@@ -25,7 +25,7 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
           const km = distance / 1000
 
           if (km < (config?.searchRadius || 10)) {
-            shop.setDistance(Number(km.toFixed(2)))
+            shop['distance'] = Number(km.toFixed(2))
             shopInArea.push(shop)
           }
         }
