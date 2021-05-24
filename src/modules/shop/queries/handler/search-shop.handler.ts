@@ -8,8 +8,9 @@ import { GoogleMapService } from '@my-guardian-api/google-map'
 export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
   constructor(
     private readonly entityManager: EntityManager,
-    private readonly googleMapService: GoogleMapService,
-  ) {}
+    private readonly googleMapService: GoogleMapService
+  ) {
+  }
 
   async execute({ body }: SearchShopQuery): Promise<ShopModel[]> {
     const config = await this.entityManager.findOne(ConfigModel)
@@ -18,10 +19,7 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
 
     for (const shop of shops) {
       if (shop?.geolocation?.lat && shop?.geolocation?.lng) {
-        const distance = await this.googleMapService.distance(
-          body.geolocation,
-          shop.geolocation,
-        )
+        const distance = await this.googleMapService.distance(body.geolocation, shop.geolocation)
 
         if (distance >= 0) {
           const km = distance / 1000
