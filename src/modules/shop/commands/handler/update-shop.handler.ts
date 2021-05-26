@@ -45,8 +45,8 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
       available: body.available
     })
 
-    shop.schedules = []
-    shop.prices = []
+    shop.clearSchedules()
+    shop.clearPrices()
 
     shop = await this.entityManager.save(shop)
 

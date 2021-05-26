@@ -1,7 +1,7 @@
-import { EntityRepository } from 'typeorm'
-import { BaseModel, VoucherHistoryModel } from '@my-guardian-api/database'
+import { EntityRepository, Repository } from 'typeorm'
+import { VoucherHistoryModel } from '@my-guardian-api/database'
 
 @EntityRepository(VoucherHistoryModel)
-export class VoucherHistoryRepository extends BaseModel {
-  
+export class VoucherHistoryRepository extends Repository<VoucherHistoryModel> {
+
 }

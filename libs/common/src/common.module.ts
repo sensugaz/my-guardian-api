@@ -7,7 +7,9 @@ import { ValidationPipe } from '@my-guardian-api/common/pipes'
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     CqrsModule
   ],
   exports: [

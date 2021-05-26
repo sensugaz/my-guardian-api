@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, OneToMany } from 'typeorm'
 import { ApiHideProperty } from '@nestjs/swagger'
 import { BaseModel } from '@my-guardian-api/database/models/base.model'
+import { BookingModel } from '@my-guardian-api/database/models/booking.model'
 
 @Entity('customers')
 export class CustomerModel extends BaseModel {
@@ -30,11 +31,31 @@ export class CustomerModel extends BaseModel {
     name: 'phone_number'
   })
   phoneNumber: string
-  
+
+  @Column({
+    nullable: true
+  })
+
+  @Column({
+    name: 'stripe_customer_id',
+    nullable: true
+  })
+  stripeCustomerId: string
+
+  @OneToMany(() => BookingModel, (x) => x.customer, {
+    cascade: true,
+    eager: true
+  })
+  bookings: BookingModel[]
+
   updateProfile(profile: { firstName: string, lastName: string, phoneCode: string, phoneNumber: string, isVerify?: boolean }) {
     this.firstName = profile?.firstName
     this.lastName = profile?.lastName
     this.phoneCode = profile?.phoneCode
     this.phoneNumber = profile?.phoneNumber
+  }
+
+  setStripeCustomerId(customerId) {
+    this.stripeCustomerId = customerId
   }
 }

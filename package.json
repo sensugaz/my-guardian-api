@@ -38,6 +38,7 @@
     "express-useragent": "^1.0.15",
     "ip": "^1.1.5",
     "moment": "^2.29.1",
+    "nestjs-stripe": "^0.4.1",
     "nestjs-typeorm-paginate": "^2.3.2",
     "nodemailer": "^6.6.0",
     "nodemailer-express-handlebars": "^4.0.0",

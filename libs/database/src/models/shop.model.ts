@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany } from 'typeorm'
 import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { ShopScheduleModel } from '@my-guardian-api/database/models/shop-schedule.model'
 import { ShopPriceModel } from '@my-guardian-api/database/models/shop-price.model'
+import { BookingModel } from '@my-guardian-api/database/models/booking.model'
 
 @Entity('shops')
 export class ShopModel extends BaseModel {
@@ -52,7 +53,11 @@ export class ShopModel extends BaseModel {
   })
   prices: ShopPriceModel[]
 
-  distance: number
+  @OneToMany(() => BookingModel, (x) => x.shop, {
+    cascade: true,
+    eager: true
+  })
+  bookings: BookingModel[]
 
   addSchedule(schedule: ShopScheduleModel) {
     if (!this.schedules) {
@@ -91,9 +96,4 @@ export class ShopModel extends BaseModel {
   clearPrices() {
     this.prices = []
   }
-
-  //
-  // setDistance(d: number) {
-  //   this.distance = d
-  // }
 }
