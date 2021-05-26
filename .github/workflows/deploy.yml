@@ -41,12 +41,9 @@ jobs:
           envkey_SMTP_USER: ${{ secrets.SMTP_USER }}
           envkey_SMTP_PASS: ${{ secrets.SMTP_PASS }}
           envkey_BASE_URL: ${{ secrets.BASE_URL }}
-<<<<<<< HEAD
+          envkey_GOOGLE_MAP_API_KEY: ${{ secrets.GOOGLE_MAP_API_KEY }}
           envkey_STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           envkey_STRIPE_SECRET_API_KEY: ${{ secrets.STRIPE_SECRET_API_KEY }}
-=======
-          envkey_GOOGLE_MAP_API_KEY: ${{ secrets.GOOGLE_MAP_API_KEY }}
->>>>>>> master
           directory: './'
           file_name: .env
 
