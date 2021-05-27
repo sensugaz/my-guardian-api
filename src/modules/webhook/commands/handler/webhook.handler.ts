@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { BookingRepository, ShopRepository, VoucherHistoryRepository } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
-import { HttpStatus, Logger } from '@nestjs/common'
+import { HttpStatus } from '@nestjs/common'
 
 @CommandHandler(WebhookCommand)
 export class WebhookHandler implements ICommandHandler<WebhookCommand> {
@@ -17,13 +17,11 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
 
   async execute({ body }: WebhookCommand): Promise<any> {
     const booking = await this.bookingRepository.findOne({
-      id: body.data?.metadata?.bookingId
+      id: body.data?.object?.metadata?.bookingId
     }, {
       relations: ['shop', 'customer']
     })
 
-    Logger.debug(body.type)
-    Logger.debug(body.data?.metadata?.bookingId)
     console.log(booking)
 
     if (!booking) {
@@ -34,7 +32,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         statusCode: HttpStatus.BAD_REQUEST
       })
     }
-    
+
     switch (body.type) {
       case 'payment_intent.succeeded':
         booking.updatePaymentStatus(PaymentStatusEnum.PAID)
