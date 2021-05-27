@@ -8,13 +8,9 @@ import {
   BookingRepository,
   CustomerRepository,
   ShopRepository,
-  VoucherRepository,
+  VoucherRepository
 } from '@my-guardian-api/database/repositories'
-import {
-  ApiException,
-  BookingStatusEnum,
-  PaymentStatusEnum,
-} from '@my-guardian-api/common'
+import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
 
 @CommandHandler(CheckoutCommand)
 export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
@@ -28,19 +24,20 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
     @InjectRepository(VoucherRepository)
     private readonly voucherRepository: VoucherRepository,
     @InjectRepository(BookingRepository)
-    private readonly bookingRepository: BookingRepository,
-  ) {}
+    private readonly bookingRepository: BookingRepository
+  ) {
+  }
 
   async execute({
-    user,
-    body,
-  }: CheckoutCommand): Promise<{
+                  user,
+                  body
+                }: CheckoutCommand): Promise<{
     paymentIntent: string
     ephemeralKey: string
     customer: string
   }> {
     let customer = await this.customerRepository.findOne({
-      userId: user.id,
+      userId: user.id
     })
 
     if (!customer) {
@@ -48,17 +45,17 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         type: 'application',
         module: 'booking',
         codes: ['customer_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
     const shop = await this.shopRepository.findOne(
       {
-        id: body.shopId,
+        id: body.shopId
       },
       {
-        relations: ['schedules', 'prices'],
-      },
+        relations: ['schedules', 'prices']
+      }
     )
 
     if (!shop) {
@@ -66,7 +63,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         type: 'application',
         module: 'booking',
         codes: ['shop_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
@@ -77,7 +74,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         type: 'application',
         module: 'booking',
         codes: ['schedule_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
@@ -86,7 +83,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         type: 'application',
         module: 'booking',
         codes: ['schedule_is_closed'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
@@ -97,7 +94,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         type: 'application',
         module: 'booking',
         codes: ['price_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
@@ -106,7 +103,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
 
     if (body.voucherCode) {
       const voucher = await this.voucherRepository.findOne({
-        code: body.voucherCode,
+        code: body.voucherCode
       })
 
       if (!voucher) {
@@ -114,7 +111,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
           type: 'application',
           module: 'booking',
           codes: ['voucher_not_found'],
-          statusCode: HttpStatus.BAD_REQUEST,
+          statusCode: HttpStatus.BAD_REQUEST
         })
       }
 
@@ -136,8 +133,8 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         discount: discount,
         totalAmount: totalAmount,
         paymentStatus: PaymentStatusEnum.PENDING,
-        bookingStatus: BookingStatusEnum.PENDING,
-      }),
+        bookingStatus: BookingStatusEnum.PENDING
+      })
     )
 
     if (!customer.stripeCustomerId) {
@@ -148,7 +145,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
 
     const ephemeralKey = await this.stripeClient.ephemeralKeys.create(
       { customer: customer.stripeCustomerId },
-      { apiVersion: '2020-08-27' },
+      { apiVersion: '2020-08-27' }
     )
 
     const paymentIntent = await this.stripeClient.paymentIntents.create({
@@ -156,14 +153,14 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       currency: 'eur',
       customer: customer.stripeCustomerId,
       metadata: {
-        bookingId: 'TEST',
-      },
+        bookingId: 'TEST'
+      }
     })
 
     return {
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
-      customer: customer.stripeCustomerId,
+      customer: customer.stripeCustomerId
     }
   }
 }

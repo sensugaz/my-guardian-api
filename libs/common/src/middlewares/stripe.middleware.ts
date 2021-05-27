@@ -22,7 +22,7 @@ export class StripeMiddleware implements NestMiddleware {
     } catch (e) {
       throw new UnauthorizedException()
     }
-
+    
     next()
   }
 }

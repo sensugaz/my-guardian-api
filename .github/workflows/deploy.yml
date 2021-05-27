@@ -44,6 +44,7 @@ jobs:
           envkey_GOOGLE_MAP_API_KEY: ${{ secrets.GOOGLE_MAP_API_KEY }}
           envkey_STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           envkey_STRIPE_SECRET_API_KEY: ${{ secrets.STRIPE_SECRET_API_KEY }}
+          envkey_STRIPE_SIGNING_SECRET: ${{ secrets.STRIPE_SIGNING_SECRET }}
           directory: './'
           file_name: .env
 
