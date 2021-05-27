@@ -61,6 +61,14 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
             code: booking.voucherCode
           }))
         }
+
+        const user = await this.userRepository.findOne({ id: booking.shop.userId })
+
+        if (booking.qty == 1) {
+          await this.mailerService.sendWithTemplate(user.email, 'New order solo offer', {}, 'solo-booking')
+        } else {
+          await this.mailerService.sendWithTemplate(user.email, 'New order duo offer', {}, 'duo-booking')
+        }
         break
       case 'payment_intent.processing':
         booking.updatePaymentStatus(PaymentStatusEnum.PROCESSING)
@@ -73,14 +81,6 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
         booking.updateBookingStatus(BookingStatusEnum.FAILED)
         break
-    }
-
-    const user = await this.userRepository.findOne({ id: booking.shop.userId })
-
-    if (booking.qty == 1) {
-      await this.mailerService.sendWithTemplate(user.email, 'New order solo offer', {}, 'solo-booking')
-    } else {
-      await this.mailerService.sendWithTemplate(user.email, 'New order duo offer', {}, 'duo-booking')
     }
 
     return await this.bookingRepository.save(booking)
