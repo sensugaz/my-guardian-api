@@ -4,8 +4,13 @@ import { InjectStripe } from 'nestjs-stripe'
 import Stripe from 'stripe'
 import { HttpStatus } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { CustomerRepository, ShopRepository, VoucherRepository } from '@my-guardian-api/database/repositories'
-import { ApiException } from '@my-guardian-api/common'
+import {
+  BookingRepository,
+  CustomerRepository,
+  ShopRepository,
+  VoucherRepository
+} from '@my-guardian-api/database/repositories'
+import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
 
 @CommandHandler(CheckoutCommand)
 export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
@@ -16,7 +21,9 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
               @InjectRepository(ShopRepository)
               private readonly shopRepository: ShopRepository,
               @InjectRepository(VoucherRepository)
-              private readonly voucherRepository: VoucherRepository) {
+              private readonly voucherRepository: VoucherRepository,
+              @InjectRepository(BookingRepository)
+              private readonly bookingRepository: BookingRepository) {
   }
 
   async execute({
@@ -62,6 +69,15 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       })
     }
 
+    if (schedule.isClose) {
+      throw new ApiException({
+        type: 'application',
+        module: 'booking',
+        codes: ['schedule_is_closed'],
+        statusCode: HttpStatus.BAD_REQUEST
+      })
+    }
+
     const price = shop.prices.find(i => i.id === body.priceId)
 
     if (!price) {
@@ -73,8 +89,9 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       })
     }
 
-    let amount = price.price
+    const amount = price.price
     let discount = 0
+
     if (body.voucherCode) {
       const voucher = await this.voucherRepository.findOne({
         code: body.voucherCode
@@ -92,9 +109,22 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       discount = amount * (voucher.percent / 100)
     }
 
-    amount = Number(amount) - discount
+    const totalAmount = Number(amount) - discount
 
-    // save to database
+    await this.bookingRepository.save(this.bookingRepository.create({
+      shop: shop,
+      customer: customer,
+      voucherCode: body.voucherCode,
+      scheduleDay: schedule.day,
+      scheduleOpenTime: schedule.openTime,
+      scheduleCloseTime: schedule.closeTime,
+      type: price.name,
+      amount: amount,
+      discount: discount,
+      totalAmount: totalAmount,
+      paymentStatus: PaymentStatusEnum.PENDING,
+      bookingStatus: BookingStatusEnum.PENDING
+    }))
 
     if (!customer.stripeCustomerId) {
       const { id } = await this.stripeClient.customers.create()
@@ -108,9 +138,12 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
     )
 
     const paymentIntent = await this.stripeClient.paymentIntents.create({
-      amount: Number(amount + '00'),
+      amount: Number(totalAmount + '00'),
       currency: 'eur',
-      customer: customer.stripeCustomerId
+      customer: customer.stripeCustomerId,
+      metadata: {
+        bookingId: 'TEST'
+      }
     })
 
     return {

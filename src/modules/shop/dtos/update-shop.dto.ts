@@ -27,6 +27,9 @@ class Price {
 
   @IsNumber()
   price: number
+  
+  @IsNumber()
+  qty: number
 }
 
 class Schedule {

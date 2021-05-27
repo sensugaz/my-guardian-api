@@ -71,7 +71,8 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
     for (const price of body.prices) {
       const priceModel = this.entityManager.create(ShopPriceModel, {
         name: price.name,
-        price: price.price
+        price: price.price,
+        qty: price.qty
       })
 
       shop.addPrice(priceModel)

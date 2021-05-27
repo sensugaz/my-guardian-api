@@ -1,5 +1,6 @@
-export class BookingStatusEnum {
-  COMPLETED = 'COMPLETED'
-  CANCELLED = 'CANCELLED'
-  FAILED = 'FAILED'
+export enum BookingStatusEnum {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED',
 }

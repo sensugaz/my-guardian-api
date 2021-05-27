@@ -14,6 +14,9 @@ export class ShopPriceModel extends BaseModel {
   })
   price: number
 
+  @Column()
+  qty: number
+
   @ManyToOne(() => ShopModel, x => x.schedules)
   @JoinColumn({
     name: 'shop_id'
