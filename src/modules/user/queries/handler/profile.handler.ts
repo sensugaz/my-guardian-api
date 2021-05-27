@@ -6,15 +6,14 @@ import { RoleEnum } from '@my-guardian-api/common'
 
 @QueryHandler(ProfileQuery)
 export class ProfileHandler implements IQueryHandler<ProfileQuery> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ user }: ProfileQuery): Promise<UserModel> {
     let profile: any = {}
     switch (user?.role?.key) {
       case RoleEnum.CUSTOMER:
         profile = await this.entityManager.findOne(CustomerModel, {
-          userId: user.id
+          userId: user.id,
         })
         break
     }
@@ -26,5 +25,4 @@ export class ProfileHandler implements IQueryHandler<ProfileQuery> {
 
     return user
   }
-
 }

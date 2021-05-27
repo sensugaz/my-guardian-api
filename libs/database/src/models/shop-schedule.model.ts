@@ -9,24 +9,24 @@ export class ShopScheduleModel extends BaseModel {
 
   @Column({
     nullable: true,
-    name: 'open_time'
+    name: 'open_time',
   })
   openTime: string
 
   @Column({
     nullable: true,
-    name: 'close_time'
+    name: 'close_time',
   })
   closeTime: string
 
   @Column({
-    name: 'is_close'
+    name: 'is_close',
   })
   isClose: boolean
 
-  @ManyToOne(() => ShopModel, x => x.schedules)
+  @ManyToOne(() => ShopModel, (x) => x.schedules)
   @JoinColumn({
-    name: 'shop_id'
+    name: 'shop_id',
   })
   shop: ShopModel
 }

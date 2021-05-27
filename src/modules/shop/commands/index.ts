@@ -1,7 +1,11 @@
-import { CreateShopHandler, DeleteShopHandler, UpdateShopHandler } from './handler'
+import {
+  CreateShopHandler,
+  DeleteShopHandler,
+  UpdateShopHandler,
+} from './handler'
 
 export const CommandHandlers = [
   CreateShopHandler,
   UpdateShopHandler,
-  DeleteShopHandler
+  DeleteShopHandler,
 ]

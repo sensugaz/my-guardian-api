@@ -7,16 +7,21 @@ import { parserToTypeOrmQueryBuilder } from '@my-guardian-api/common'
 
 @QueryHandler(GetVoucherQuery)
 export class GetVoucherHandler implements IQueryHandler<GetVoucherQuery> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute(query: GetVoucherQuery): Promise<Pagination<VoucherModel>> {
     const tableName = 'vouchers'
-    let queryBuilder: any = this.entityManager.getRepository(VoucherModel)
+    let queryBuilder: any = this.entityManager
+      .getRepository(VoucherModel)
       .createQueryBuilder(tableName)
       .withDeleted()
-    queryBuilder = await parserToTypeOrmQueryBuilder(tableName, query.query, queryBuilder, query.sort, query.orderBy)
+    queryBuilder = await parserToTypeOrmQueryBuilder(
+      tableName,
+      query.query,
+      queryBuilder,
+      query.sort,
+      query.orderBy,
+    )
     return await paginate(queryBuilder, query.options)
   }
-
 }

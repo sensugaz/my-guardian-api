@@ -7,14 +7,19 @@ import { EntityManager } from 'typeorm'
 
 @QueryHandler(GetShopByIdQuery)
 export class GetShopByIdHandler implements IQueryHandler<GetShopByIdQuery> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ userId }: GetShopByIdQuery): Promise<UserModel> {
-    const result = await this.entityManager.getRepository(UserModel)
+    const result = await this.entityManager
+      .getRepository(UserModel)
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.role', 'roles')
-      .innerJoinAndMapOne('users.profile', ShopModel, 'shops', 'users.id = shops.user_id')
+      .innerJoinAndMapOne(
+        'users.profile',
+        ShopModel,
+        'shops',
+        'users.id = shops.user_id',
+      )
       .leftJoinAndSelect('shops.schedules', 'schedules')
       .leftJoinAndSelect('shops.prices', 'prices')
       .where('roles.key = :role', { role: RoleEnum.CUSTOMER })
@@ -27,7 +32,7 @@ export class GetShopByIdHandler implements IQueryHandler<GetShopByIdQuery> {
         type: 'application',
         module: 'customer',
         codes: ['customer_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 

@@ -7,9 +7,9 @@ import { HttpStatus } from '@nestjs/common'
 import { ApiException } from '@my-guardian-api/common'
 
 @CommandHandler(ChangePasswordCommand)
-export class ChangePasswordHandler implements ICommandHandler<ChangePasswordCommand> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+export class ChangePasswordHandler
+  implements ICommandHandler<ChangePasswordCommand> {
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ user, body }: ChangePasswordCommand): Promise<UserModel> {
     const compare = await bcrypt.compare(body.oldPassword, user.password)
@@ -19,7 +19,7 @@ export class ChangePasswordHandler implements ICommandHandler<ChangePasswordComm
         type: 'application',
         module: 'user',
         codes: ['old_password_not_match'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
@@ -32,8 +32,7 @@ export class ChangePasswordHandler implements ICommandHandler<ChangePasswordComm
 
     delete user.password
     delete user.salt
-    
+
     return user
   }
-
 }

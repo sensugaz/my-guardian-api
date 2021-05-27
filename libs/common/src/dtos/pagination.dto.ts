@@ -17,8 +17,7 @@ export class PaginationDto {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface IPaginationMeta {
-}
+interface IPaginationMeta {}
 
 class PaginationMeta implements IPaginationMeta {
   @ApiProperty()
@@ -58,7 +57,7 @@ class GetManyResponse<Entity> {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type Entity = Function;
+type Entity = Function
 
 export function getManyResponseFor(type: Entity): typeof GetManyResponse {
   class GetManyResponseForEntity<Entity> extends GetManyResponse<Entity> {
@@ -67,7 +66,7 @@ export function getManyResponseFor(type: Entity): typeof GetManyResponse {
   }
 
   Object.defineProperty(GetManyResponseForEntity, 'name', {
-    value: `GetManyResponseFor${type.name}`
+    value: `GetManyResponseFor${type.name}`,
   })
 
   return GetManyResponseForEntity

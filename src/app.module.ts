@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
-import { BookingModule, CustomerModule, ShopModule, UserModule, VoucherModule, WebhookModule } from './modules'
+import { BookingModule, CustomerModule, ShopModule, UserModule, VoucherModule } from './modules'
+import { WebhookModule } from './modules/webhook/webhook.module'
 
 @Module({
   imports: [
@@ -14,4 +15,3 @@ import { BookingModule, CustomerModule, ShopModule, UserModule, VoucherModule, W
 })
 export class AppModule {
 }
-

@@ -12,7 +12,7 @@ async function bootstrap() {
     .addBearerAuth({
       type: 'http',
       scheme: 'bearer',
-      bearerFormat: 'JWT'
+      bearerFormat: 'JWT',
     })
     .build()
 

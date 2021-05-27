@@ -6,15 +6,21 @@ import { ApiException, RoleEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 
 @QueryHandler(GetCustomerByIdQuery)
-export class GetCustomerByIdHandler implements IQueryHandler<GetCustomerByIdQuery> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+export class GetCustomerByIdHandler
+  implements IQueryHandler<GetCustomerByIdQuery> {
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ userId }: GetCustomerByIdQuery): Promise<UserModel> {
-    const result = await this.entityManager.getRepository(UserModel)
+    const result = await this.entityManager
+      .getRepository(UserModel)
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.role', 'roles')
-      .innerJoinAndMapOne('users.profile', CustomerModel, 'customers', 'users.id = customers.user_id')
+      .innerJoinAndMapOne(
+        'users.profile',
+        CustomerModel,
+        'customers',
+        'users.id = customers.user_id',
+      )
       .where('roles.key = :role', { role: RoleEnum.CUSTOMER })
       .where('users.id = :userId', { userId })
       .withDeleted()
@@ -25,7 +31,7 @@ export class GetCustomerByIdHandler implements IQueryHandler<GetCustomerByIdQuer
         type: 'application',
         module: 'customer',
         codes: ['customer_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
@@ -34,5 +40,4 @@ export class GetCustomerByIdHandler implements IQueryHandler<GetCustomerByIdQuer
 
     return result
   }
-
 }

@@ -6,20 +6,20 @@ import { ApiException } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 
 @CommandHandler(CreateVoucherCommand)
-export class CreateVoucherHandler implements ICommandHandler<CreateVoucherCommand> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+export class CreateVoucherHandler
+  implements ICommandHandler<CreateVoucherCommand> {
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ body }: CreateVoucherCommand): Promise<VoucherModel> {
     const voucherModel = this.entityManager.create(VoucherModel, {
       code: body.code.toLocaleUpperCase(),
       name: body.name,
       description: body.description,
-      percent: body.percent
+      percent: body.percent,
     })
 
     const codeExists = await this.entityManager.findOne(VoucherModel, {
-      code: body.code
+      code: body.code,
     })
 
     if (codeExists) {
@@ -27,7 +27,7 @@ export class CreateVoucherHandler implements ICommandHandler<CreateVoucherComman
         type: 'application',
         module: 'voucher',
         codes: ['code_is_exists'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 

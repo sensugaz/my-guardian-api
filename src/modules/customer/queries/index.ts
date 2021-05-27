@@ -1,6 +1,3 @@
 import { GetCustomerByIdHandler, GetCustomerHandler } from './handler'
 
-export const QueryHandlers = [
-  GetCustomerHandler,
-  GetCustomerByIdHandler
-]
+export const QueryHandlers = [GetCustomerHandler, GetCustomerByIdHandler]

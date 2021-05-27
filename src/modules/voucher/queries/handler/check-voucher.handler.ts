@@ -7,30 +7,33 @@ import { CheckVoucherQuery } from '../query'
 
 @QueryHandler(CheckVoucherQuery)
 export class CheckVoucherHandler implements IQueryHandler<CheckVoucherQuery> {
-  constructor(public readonly entityManager: EntityManager) {
-  }
+  constructor(public readonly entityManager: EntityManager) {}
 
   async execute(query: CheckVoucherQuery): Promise<VoucherModel> {
-    const voucher = await this.entityManager.findOne(VoucherModel, {
-      code: query.code.toLocaleUpperCase()
-    }, {
-      order: {
-        createdDate: OrderByEnum.DESC
-      }
-    })
+    const voucher = await this.entityManager.findOne(
+      VoucherModel,
+      {
+        code: query.code.toLocaleUpperCase(),
+      },
+      {
+        order: {
+          createdDate: OrderByEnum.DESC,
+        },
+      },
+    )
 
     if (!voucher) {
       throw new ApiException({
         type: 'application',
         module: 'voucher',
         codes: ['voucher_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
     const history = await this.entityManager.findOne(VoucherHistoryModel, {
       user: query.user,
-      code: query.code
+      code: query.code,
     })
 
     if (history) {
@@ -38,7 +41,7 @@ export class CheckVoucherHandler implements IQueryHandler<CheckVoucherQuery> {
         type: 'application',
         module: 'voucher',
         codes: ['voucher_has_been_used'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 

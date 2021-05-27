@@ -9,17 +9,19 @@ import { ApiException } from '@my-guardian-api/common'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private readonly entityManager: EntityManager,
-              private readonly configService: ConfigService) {
+  constructor(
+    private readonly entityManager: EntityManager,
+    private readonly configService: ConfigService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.get<string>('JWT_SECRET')
+      secretOrKey: configService.get<string>('JWT_SECRET'),
     })
   }
 
   async validate(payload: JwtPayload): Promise<UserModel> {
     const user = await this.entityManager.findOne(UserModel, {
-      id: payload.id
+      id: payload.id,
     })
 
     if (!user) {
@@ -27,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         type: 'infrastructure',
         module: 'auth',
         codes: ['unauthorized'],
-        statusCode: HttpStatus.UNAUTHORIZED
+        statusCode: HttpStatus.UNAUTHORIZED,
       })
     }
 

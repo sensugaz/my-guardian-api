@@ -5,13 +5,13 @@ import { CustomerModel, UserModel } from '@my-guardian-api/database'
 import { ApiException } from '@my-guardian-api/common'
 
 @CommandHandler(UpdateProfileCommand)
-export class UpdateProfileHandler implements ICommandHandler<UpdateProfileCommand> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+export class UpdateProfileHandler
+  implements ICommandHandler<UpdateProfileCommand> {
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ user, body }: UpdateProfileCommand): Promise<UserModel> {
     const customer = await this.entityManager.findOne(CustomerModel, {
-      userId: user.id
+      userId: user.id,
     })
 
     if (!customer) {
@@ -19,7 +19,7 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfileComman
         module: 'user',
         type: 'application',
         codes: ['customer_not_found'],
-        statusCode: 400
+        statusCode: 400,
       })
     }
 
@@ -27,13 +27,13 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfileComman
       firstName: body.firstName,
       lastName: body.lastName,
       phoneCode: body.phoneCode,
-      phoneNumber: body.phoneNumber
+      phoneNumber: body.phoneNumber,
     })
 
     await this.entityManager.save(customer)
 
     user['profile'] = customer
-    
+
     delete user.password
     delete user.salt
 

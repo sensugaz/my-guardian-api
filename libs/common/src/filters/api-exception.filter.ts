@@ -1,8 +1,15 @@
-import { ArgumentsHost, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common'
+import {
+  ArgumentsHost,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common'
 import { classToPlain } from 'class-transformer'
-import { ApiException, ResponseException } from '@my-guardian-api/common/exceptions'
+import {
+  ApiException,
+  ResponseException,
+} from '@my-guardian-api/common/exceptions'
 import { ApiExceptionType } from '@my-guardian-api/common/types'
-
 
 export class ApiExceptionFilter implements ExceptionFilter {
   private static getActionType(method: string) {
@@ -26,7 +33,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       codes: [],
       requestId,
       userId: user ? user.id : null,
-      method
+      method,
     })
 
     if (exception instanceof Error) {
@@ -43,7 +50,12 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     if (exception instanceof ApiException) {
-      const { module, type, codes, statusCode } = exception.getResponse() as ApiExceptionType
+      const {
+        module,
+        type,
+        codes,
+        statusCode,
+      } = exception.getResponse() as ApiExceptionType
       status = statusCode
       exceptionResponse.statusCode = statusCode
       exceptionResponse.type = type

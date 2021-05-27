@@ -1,5 +1,11 @@
 import { parse } from '@rsql/parser'
-import { ExpressionNode, getSelector, getValue, isComparisonNode, isLogicNode } from '@rsql/ast'
+import {
+  ExpressionNode,
+  getSelector,
+  getValue,
+  isComparisonNode,
+  isLogicNode,
+} from '@rsql/ast'
 import { Brackets, SelectQueryBuilder, WhereExpression } from 'typeorm'
 import { HttpStatus } from '@nestjs/common'
 import { OrderByEnum } from '../enums'
@@ -9,13 +15,23 @@ import { StringUtil } from './string.util'
 const logicalAND: string[] = [';', 'and']
 const logicalOR: string[] = [',', 'or']
 
-export async function parserToTypeOrmQueryBuilder(tableName: string, query: string, repo: SelectQueryBuilder<any>, sort = 'created_date', orderBy: OrderByEnum = OrderByEnum.ASC): Promise<SelectQueryBuilder<any> | WhereExpression> {
+export async function parserToTypeOrmQueryBuilder(
+  tableName: string,
+  query: string,
+  repo: SelectQueryBuilder<any>,
+  sort = 'created_date',
+  orderBy: OrderByEnum = OrderByEnum.ASC,
+): Promise<SelectQueryBuilder<any> | WhereExpression> {
   try {
     sort = tableName + '.' + StringUtil.snakeToCamel(sort)
 
     if (query) {
       const queryParse = parse(query)
-      const repository: any = await parseExpressionToQueryBuilder(repo, queryParse, '')
+      const repository: any = await parseExpressionToQueryBuilder(
+        repo,
+        queryParse,
+        '',
+      )
       return repository.orderBy(sort, orderBy)
     } else {
       return repo.orderBy(sort, orderBy)
@@ -25,12 +41,16 @@ export async function parserToTypeOrmQueryBuilder(tableName: string, query: stri
       module: 'system',
       type: 'application',
       codes: ['query_syntax_not_supported'],
-      statusCode: HttpStatus.BAD_REQUEST
+      statusCode: HttpStatus.BAD_REQUEST,
     })
   }
 }
 
-async function parseExpressionToQueryBuilder(repo: SelectQueryBuilder<any> | WhereExpression, expression: ExpressionNode, logical: string): Promise<SelectQueryBuilder<any> | WhereExpression> {
+async function parseExpressionToQueryBuilder(
+  repo: SelectQueryBuilder<any> | WhereExpression,
+  expression: ExpressionNode,
+  logical: string,
+): Promise<SelectQueryBuilder<any> | WhereExpression> {
   if (isComparisonNode(expression)) {
     return comparison2queryBuilder(repo, expression, logical)
   }
@@ -38,25 +58,30 @@ async function parseExpressionToQueryBuilder(repo: SelectQueryBuilder<any> | Whe
   if (isLogicNode(expression)) {
     const { operator, left, right } = expression
 
-    repo.andWhere(new Brackets(async qb => {
-      await parseExpressionToQueryBuilder(qb, left, operator)
-    }))
+    repo.andWhere(
+      new Brackets(async (qb) => {
+        await parseExpressionToQueryBuilder(qb, left, operator)
+      }),
+    )
 
     if (isAndLogical(operator)) {
-      return repo.andWhere(new Brackets(async qb => {
-        await parseExpressionToQueryBuilder(qb, right, operator)
-      }))
-
+      return repo.andWhere(
+        new Brackets(async (qb) => {
+          await parseExpressionToQueryBuilder(qb, right, operator)
+        }),
+      )
     } else if (isORLogical(operator)) {
-      return repo.orWhere(new Brackets(async qb => {
-        await parseExpressionToQueryBuilder(qb, right, operator)
-      }))
+      return repo.orWhere(
+        new Brackets(async (qb) => {
+          await parseExpressionToQueryBuilder(qb, right, operator)
+        }),
+      )
     } else {
       throw new ApiException({
         module: 'system',
         type: 'application',
         codes: ['query_syntax_not_supported'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
   }
@@ -64,13 +89,20 @@ async function parseExpressionToQueryBuilder(repo: SelectQueryBuilder<any> | Whe
   return repo
 }
 
-function comparison2queryBuilder(model: SelectQueryBuilder<any> | WhereExpression, expression: ExpressionNode, logical: string): SelectQueryBuilder<any> | WhereExpression {
+function comparison2queryBuilder(
+  model: SelectQueryBuilder<any> | WhereExpression,
+  expression: ExpressionNode,
+  logical: string,
+): SelectQueryBuilder<any> | WhereExpression {
   if (isComparisonNode(expression)) {
     const { operator } = expression
     const selector = getSelector(expression)
     const value = getValue(expression)
-    let val = (operator == '=in=' || operator == '=out=') ? `(:...${selector})` : `:${selector}`
-    const likeString = (operator == '=like=' || operator == '=ilike=') ? `%` : ''
+    let val =
+      operator == '=in=' || operator == '=out='
+        ? `(:...${selector})`
+        : `:${selector}`
+    const likeString = operator == '=like=' || operator == '=ilike=' ? `%` : ''
     const param = {}
 
     if (likeString !== '') {
@@ -83,7 +115,9 @@ function comparison2queryBuilder(model: SelectQueryBuilder<any> | WhereExpressio
       val = ''
     }
 
-    const stringQuery = `${StringUtil.camelToSnake(selector)} ${operatorMapping(operator)} ${val}`
+    const stringQuery = `${StringUtil.camelToSnake(selector)} ${operatorMapping(
+      operator,
+    )} ${val}`
 
     if (isORLogical(logical)) {
       model = model.orWhere(stringQuery, param)
@@ -108,10 +142,10 @@ function operatorMapping(operator: string): string {
     '=ge=': '>=',
     '=like=': 'LIKE',
     '=ilike=': 'ILIKE',
-    '=isnull=': 'IS NULL'
+    '=isnull=': 'IS NULL',
   }
 
-  return (op[operator]) ? op[operator] : operator
+  return op[operator] ? op[operator] : operator
 }
 
 function isAndLogical(value: string): boolean {

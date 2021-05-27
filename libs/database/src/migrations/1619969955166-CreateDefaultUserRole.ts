@@ -9,21 +9,20 @@ export class CreateDefaultUserRole1619969955166 implements MigrationInterface {
     const defaultRole = await repository.create([
       {
         key: RoleEnum.ADMIN,
-        value: 'Admin'
+        value: 'Admin',
       },
       {
         key: RoleEnum.CUSTOMER,
-        value: 'Customer'
+        value: 'Customer',
       },
       {
         key: RoleEnum.SHOP,
-        value: 'Shop'
-      }
+        value: 'Shop',
+      },
     ])
 
     await repository.save([...defaultRole])
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
-  }
+  public async down(queryRunner: QueryRunner): Promise<void> {}
 }

@@ -8,12 +8,11 @@ import * as bcrypt from 'bcrypt'
 
 @CommandHandler(CreateShopCommand)
 export class CreateShopHandler implements ICommandHandler<CreateShopCommand> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ body }: CreateShopCommand): Promise<UserModel> {
     const emailExists = await this.entityManager.findOne(UserModel, {
-      email: body.email
+      email: body.email,
     })
 
     if (emailExists) {
@@ -21,12 +20,12 @@ export class CreateShopHandler implements ICommandHandler<CreateShopCommand> {
         type: 'application',
         module: 'shop',
         codes: ['email_is_exists'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
     const role = await this.entityManager.findOne(RoleModel, {
-      key: RoleEnum.SHOP
+      key: RoleEnum.SHOP,
     })
 
     if (!role) {
@@ -34,7 +33,7 @@ export class CreateShopHandler implements ICommandHandler<CreateShopCommand> {
         type: 'application',
         module: 'shop',
         codes: ['role_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
@@ -46,14 +45,14 @@ export class CreateShopHandler implements ICommandHandler<CreateShopCommand> {
       password: password,
       salt: salt,
       isActivate: true,
-      role: role
+      role: role,
     })
 
     const user = await this.entityManager.save(UserModel, userModel)
 
     const shopModel = this.entityManager.create(ShopModel, {
       userId: user.id,
-      available: 0
+      available: 0,
     })
 
     user['profile'] = await this.entityManager.save(ShopModel, shopModel)

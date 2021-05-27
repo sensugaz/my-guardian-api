@@ -14,7 +14,7 @@ export class UserTokenModel extends BaseModel {
   @Column({
     type: 'timestamp',
     name: 'expired_date',
-    nullable: true
+    nullable: true,
   })
   expiredDate: Date
 
@@ -24,14 +24,14 @@ export class UserTokenModel extends BaseModel {
   @Column({
     type: 'boolean',
     name: 'used',
-    default: false
+    default: false,
   })
   used: boolean
 
   @ApiHideProperty()
-  @ManyToOne(() => UserModel, x => x.tokens)
+  @ManyToOne(() => UserModel, (x) => x.tokens)
   @JoinColumn({
-    name: 'user_id'
+    name: 'user_id',
   })
   user: UserModel
 
@@ -47,21 +47,22 @@ export class UserTokenModel extends BaseModel {
         module: 'common',
         type: 'domain',
         codes: ['token_has_been_used'],
-        statusCode: 400
+        statusCode: 400,
       })
     }
   }
 
   isExpired() {
     if (this.expiredDate) {
-      const isExpired = moment(this.expiredDate).diff(moment().utc(), 'seconds') <= 0
+      const isExpired =
+        moment(this.expiredDate).diff(moment().utc(), 'seconds') <= 0
 
       if (isExpired) {
         throw new ApiException({
           module: 'common',
           type: 'application',
           codes: ['token_is_expired'],
-          statusCode: 400
+          statusCode: 400,
         })
       }
     }

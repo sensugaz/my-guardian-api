@@ -1,4 +1,9 @@
-import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  CreateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 export class BaseModel {
   @PrimaryGeneratedColumn('uuid')
@@ -6,19 +11,19 @@ export class BaseModel {
 
   @CreateDateColumn({
     type: 'timestamp without time zone',
-    name: 'created_date'
+    name: 'created_date',
   })
   createdDate: Date
 
   @UpdateDateColumn({
     type: 'timestamp without time zone',
-    name: 'updated_date'
+    name: 'updated_date',
   })
   updatedDate: Date
 
   @DeleteDateColumn({
     type: 'timestamp without time zone',
-    name: 'deleted_date'
+    name: 'deleted_date',
   })
   deletedDate: Date
 }

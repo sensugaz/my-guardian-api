@@ -17,8 +17,8 @@ export class MailerService {
       secure: true,
       auth: {
         user: configService.get<string>('SMTP_USER'),
-        pass: configService.get<string>('SMTP_PASS')
-      }
+        pass: configService.get<string>('SMTP_PASS'),
+      },
     })
   }
 
@@ -27,31 +27,38 @@ export class MailerService {
       from: this.configService.get<string>('SMTP_USER'),
       to,
       subject,
-      html: content
+      html: content,
     }
 
     return this.transporter.sendMail(mailOptions)
   }
 
-
-  sendWithTemplate(to: string, subject: string, context: any, template: string): Promise<SentMessageInfo> {
-    this.transporter.use('compile', hbs({
-      viewEngine: {
+  sendWithTemplate(
+    to: string,
+    subject: string,
+    context: any,
+    template: string,
+  ): Promise<SentMessageInfo> {
+    this.transporter.use(
+      'compile',
+      hbs({
+        viewEngine: {
+          extName: '.hbs',
+          partialsDir: join(__dirname, 'templates'),
+          layoutsDir: join(__dirname, 'templates'),
+          defaultLayout: '',
+        },
+        viewPath: join(__dirname, 'templates'),
         extName: '.hbs',
-        partialsDir: join(__dirname, 'templates'),
-        layoutsDir: join(__dirname, 'templates'),
-        defaultLayout: ''
-      },
-      viewPath: join(__dirname, 'templates'),
-      extName: '.hbs'
-    }))
+      }),
+    )
 
     const mailOptions = {
       from: this.configService.get<string>('SMTP_USER'),
       to,
       subject,
       context: { context },
-      template
+      template,
     }
 
     return this.transporter.sendMail(mailOptions)

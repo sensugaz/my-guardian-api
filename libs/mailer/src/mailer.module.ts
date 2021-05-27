@@ -5,8 +5,6 @@ import { MailerService } from '@my-guardian-api/mailer/mailer.service'
 @Module({
   imports: [ConfigModule],
   providers: [MailerService],
-  exports: [MailerService]
+  exports: [MailerService],
 })
-export class MailerModule {
-}
-
+export class MailerModule {}

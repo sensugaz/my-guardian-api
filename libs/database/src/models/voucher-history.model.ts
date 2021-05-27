@@ -6,9 +6,9 @@ import { UserModel } from '@my-guardian-api/database/models/user.model'
 @Entity('voucher_histories')
 export class VoucherHistoryModel extends BaseModel {
   @ApiHideProperty()
-  @ManyToOne(() => UserModel, x => x.vouchers)
+  @ManyToOne(() => UserModel, (x) => x.vouchers)
   @JoinColumn({
-    name: 'user_id'
+    name: 'user_id',
   })
   user: UserModel
 

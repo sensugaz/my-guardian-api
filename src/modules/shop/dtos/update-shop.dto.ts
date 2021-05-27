@@ -8,7 +8,7 @@ import {
   IsNumber,
   IsObject,
   IsOptional,
-  ValidateNested
+  ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { DayEnum } from '@my-guardian-api/common'
@@ -27,7 +27,7 @@ class Price {
 
   @IsNumber()
   price: number
-  
+
   @IsNumber()
   qty: number
 }

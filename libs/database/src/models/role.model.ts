@@ -13,6 +13,6 @@ export class RoleModel extends BaseModel {
   value: string
 
   @ApiHideProperty()
-  @OneToMany(() => UserModel, x => x.role)
+  @OneToMany(() => UserModel, (x) => x.role)
   user: UserModel[]
 }

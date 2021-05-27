@@ -10,16 +10,16 @@ export class ShopPriceModel extends BaseModel {
   @Column({
     type: 'decimal',
     precision: 6,
-    scale: 2
+    scale: 2,
   })
   price: number
 
   @Column()
   qty: number
 
-  @ManyToOne(() => ShopModel, x => x.schedules)
+  @ManyToOne(() => ShopModel, (x) => x.schedules)
   @JoinColumn({
-    name: 'shop_id'
+    name: 'shop_id',
   })
   shop: ShopModel
 }

@@ -11,7 +11,7 @@ import {
   Put,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { Roles } from '@my-guardian-api/auth/decorators'
@@ -20,8 +20,16 @@ import { VoucherModel } from '@my-guardian-api/database'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { CreateVoucherDto, UpdateVoucherDto } from '../dtos'
-import { CreateVoucherCommand, DeleteVoucherCommand, UpdateVoucherCommand } from '../commands/command'
-import { CheckVoucherQuery, GetVoucherByIdQuery, GetVoucherQuery } from '../queries/query'
+import {
+  CreateVoucherCommand,
+  DeleteVoucherCommand,
+  UpdateVoucherCommand,
+} from '../commands/command'
+import {
+  CheckVoucherQuery,
+  GetVoucherByIdQuery,
+  GetVoucherQuery,
+} from '../queries/query'
 import { Pagination } from 'nestjs-typeorm-paginate'
 
 @ApiTags('vouchers')
@@ -29,9 +37,10 @@ import { Pagination } from 'nestjs-typeorm-paginate'
 @ApiBearerAuth()
 @UseGuards(AuthGuard(['jwt']), RolesGuard)
 export class VoucherController {
-  constructor(private readonly commandBus: CommandBus,
-              private readonly queryBus: QueryBus) {
-  }
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post()
   @Roles(RoleEnum.ADMIN)
@@ -43,18 +52,21 @@ export class VoucherController {
   @Put(':id')
   @ApiParam({
     name: 'id',
-    required: this
+    required: this,
   })
   @Roles(RoleEnum.ADMIN)
   @HttpCode(HttpStatus.OK)
-  updateVoucher(@Param('id') id: string, @Body() body: UpdateVoucherDto): Promise<VoucherModel> {
+  updateVoucher(
+    @Param('id') id: string,
+    @Body() body: UpdateVoucherDto,
+  ): Promise<VoucherModel> {
     return this.commandBus.execute(new UpdateVoucherCommand(id, body))
   }
 
   @Delete(':id')
   @ApiParam({
     name: 'id',
-    required: this
+    required: this,
   })
   @Roles(RoleEnum.ADMIN)
   @HttpCode(HttpStatus.OK)
@@ -62,26 +74,29 @@ export class VoucherController {
     return this.commandBus.execute(new DeleteVoucherCommand(id))
   }
 
-
   @Get()
   @ApiQuery({
     name: 'query',
-    required: false
+    required: false,
   })
   @Roles(RoleEnum.ADMIN)
-  getVoucher(@Query('query') query: string,
-             @Query() param: PaginationDto): Promise<Pagination<VoucherModel>> {
+  getVoucher(
+    @Query('query') query: string,
+    @Query() param: PaginationDto,
+  ): Promise<Pagination<VoucherModel>> {
     const { page, limit, sort, orderBy } = param
-    return this.queryBus.execute(new GetVoucherQuery(query, sort, orderBy, {
-      page: page ? page : 1,
-      limit: limit > 100 ? 100 : limit
-    }))
+    return this.queryBus.execute(
+      new GetVoucherQuery(query, sort, orderBy, {
+        page: page ? page : 1,
+        limit: limit > 100 ? 100 : limit,
+      }),
+    )
   }
 
   @Get(':id')
   @ApiParam({
     name: 'id',
-    required: this
+    required: this,
   })
   @Roles(RoleEnum.ADMIN)
   getVoucherById(@Param('id') id: string): Promise<VoucherModel> {
@@ -91,7 +106,7 @@ export class VoucherController {
   @Get('check/:code')
   @ApiParam({
     name: 'code',
-    required: this
+    required: this,
   })
   checkVoucher(@Req() req, @Param('code') code: string): Promise<VoucherModel> {
     return this.queryBus.execute(new CheckVoucherQuery(req.user, code))

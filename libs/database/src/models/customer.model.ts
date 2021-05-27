@@ -8,47 +8,52 @@ export class CustomerModel extends BaseModel {
   @ApiHideProperty()
   @Column({
     type: 'uuid',
-    name: 'user_id'
+    name: 'user_id',
   })
   userId: string
 
   @Column({
-    name: 'first_name'
+    name: 'first_name',
   })
   firstName: string
 
   @Column({
-    name: 'last_name'
+    name: 'last_name',
   })
   lastName: string
 
   @Column({
-    name: 'phone_code'
+    name: 'phone_code',
   })
   phoneCode: string
 
   @Column({
-    name: 'phone_number'
+    name: 'phone_number',
   })
   phoneNumber: string
 
   @Column({
-    nullable: true
+    nullable: true,
   })
-
   @Column({
     name: 'stripe_customer_id',
-    nullable: true
+    nullable: true,
   })
   stripeCustomerId: string
 
   @OneToMany(() => BookingModel, (x) => x.customer, {
     cascade: true,
-    eager: true
+    eager: true,
   })
   bookings: BookingModel[]
 
-  updateProfile(profile: { firstName: string, lastName: string, phoneCode: string, phoneNumber: string, isVerify?: boolean }) {
+  updateProfile(profile: {
+    firstName: string
+    lastName: string
+    phoneCode: string
+    phoneNumber: string
+    isVerify?: boolean
+  }) {
     this.firstName = profile?.firstName
     this.lastName = profile?.lastName
     this.phoneCode = profile?.phoneCode

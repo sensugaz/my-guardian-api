@@ -7,28 +7,34 @@ import { ApiException, TokenTypeEnum } from '@my-guardian-api/common'
 import * as bcrypt from 'bcrypt'
 
 @CommandHandler(ResetPasswordCommand)
-export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand> {
-  constructor(private readonly entityManager: EntityManager,
-              private readonly mailerService: MailerService) {
-  }
+export class ResetPasswordHandler
+  implements ICommandHandler<ResetPasswordCommand> {
+  constructor(
+    private readonly entityManager: EntityManager,
+    private readonly mailerService: MailerService,
+  ) {}
 
   async execute({ query, body }: ResetPasswordCommand): Promise<any> {
-    const token = await this.entityManager.findOne(UserTokenModel, {
-      token: query.token,
-      type: TokenTypeEnum.FORGOT_PASSWORD
-    }, {
-      order: {
-        createdDate: 'ASC'
+    const token = await this.entityManager.findOne(
+      UserTokenModel,
+      {
+        token: query.token,
+        type: TokenTypeEnum.FORGOT_PASSWORD,
       },
-      relations: ['user']
-    })
+      {
+        order: {
+          createdDate: 'ASC',
+        },
+        relations: ['user'],
+      },
+    )
 
     if (!token) {
       throw new ApiException({
         module: 'user',
         type: 'application',
         codes: ['token_not_found'],
-        statusCode: 400
+        statusCode: 400,
       })
     }
 
@@ -37,7 +43,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
         module: 'user',
         type: 'application',
         codes: ['user_not_found'],
-        statusCode: 400
+        statusCode: 400,
       })
     }
 
@@ -52,12 +58,16 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
     await this.entityManager.save(token)
     await this.entityManager.save(token.user)
 
-    await this.mailerService.sendWithTemplate(token.user.email, 'Confirmation de changement du mot de passe', {}, 'reset-password')
+    await this.mailerService.sendWithTemplate(
+      token.user.email,
+      'Confirmation de changement du mot de passe',
+      {},
+      'reset-password',
+    )
 
     delete token.user.password
     delete token.user.salt
 
     return token.user
   }
-
 }

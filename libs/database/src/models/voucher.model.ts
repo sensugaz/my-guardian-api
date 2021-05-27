@@ -11,14 +11,14 @@ export class VoucherModel extends BaseModel {
 
   @Column({
     type: 'text',
-    nullable: true
+    nullable: true,
   })
   description: string
 
   @Column({
     type: 'decimal',
     precision: 6,
-    scale: 2
+    scale: 2,
   })
   percent: number
 

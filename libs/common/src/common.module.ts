@@ -8,24 +8,20 @@ import { ValidationPipe } from '@my-guardian-api/common/pipes'
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
-    CqrsModule
+    CqrsModule,
   ],
-  exports: [
-    ConfigModule,
-    CqrsModule
-  ],
+  exports: [ConfigModule, CqrsModule],
   providers: [
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe
+      useClass: ValidationPipe,
     },
     {
       provide: APP_FILTER,
-      useClass: ApiExceptionFilter
-    }
-  ]
+      useClass: ApiExceptionFilter,
+    },
+  ],
 })
-export class CommonModule {
-}
+export class CommonModule {}

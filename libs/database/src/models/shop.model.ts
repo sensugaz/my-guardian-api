@@ -8,24 +8,24 @@ import { BookingModel } from '@my-guardian-api/database/models/booking.model'
 export class ShopModel extends BaseModel {
   @Column({
     type: 'uuid',
-    name: 'user_id'
+    name: 'user_id',
   })
   userId: string
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   name: string
 
   @Column({
     type: 'text',
-    nullable: true
+    nullable: true,
   })
   address: string
 
   @Column({
     type: 'jsonb',
-    nullable: true
+    nullable: true,
   })
   geolocation: {
     lat: string
@@ -37,25 +37,25 @@ export class ShopModel extends BaseModel {
 
   @Column({
     type: 'text',
-    nullable: true
+    nullable: true,
   })
   description: string
 
   @OneToMany(() => ShopScheduleModel, (x) => x.shop, {
     cascade: true,
-    eager: true
+    eager: true,
   })
   schedules: ShopScheduleModel[]
 
   @OneToMany(() => ShopPriceModel, (x) => x.shop, {
     cascade: true,
-    eager: true
+    eager: true,
   })
   prices: ShopPriceModel[]
 
   @OneToMany(() => BookingModel, (x) => x.shop, {
     cascade: true,
-    eager: true
+    eager: true,
   })
   bookings: BookingModel[]
 

@@ -7,18 +7,29 @@ import { parserToTypeOrmQueryBuilder, RoleEnum } from '@my-guardian-api/common'
 
 @QueryHandler(GetShopQuery)
 export class GetShopHandler implements IQueryHandler<GetShopQuery> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute(query: GetShopQuery): Promise<Pagination<UserModel>> {
     const tableName = 'users'
-    let queryBuilder: any = this.entityManager.getRepository(UserModel)
+    let queryBuilder: any = this.entityManager
+      .getRepository(UserModel)
       .createQueryBuilder(tableName)
       .innerJoinAndSelect('users.role', 'roles')
-      .innerJoinAndMapOne('users.profile', ShopModel, 'shops', 'users.id = shops.user_id')
+      .innerJoinAndMapOne(
+        'users.profile',
+        ShopModel,
+        'shops',
+        'users.id = shops.user_id',
+      )
       .where('roles.key = :role', { role: RoleEnum.SHOP })
       .withDeleted()
-    queryBuilder = await parserToTypeOrmQueryBuilder(tableName, query.query, queryBuilder, query.sort, query.orderBy)
+    queryBuilder = await parserToTypeOrmQueryBuilder(
+      tableName,
+      query.query,
+      queryBuilder,
+      query.sort,
+      query.orderBy,
+    )
     const results = await paginate(queryBuilder, query.options)
 
     return new Pagination(
@@ -27,10 +38,10 @@ export class GetShopHandler implements IQueryHandler<GetShopQuery> {
           delete item.password
           delete item.salt
           return item
-        })
+        }),
       ),
       results.meta,
-      results.links
+      results.links,
     )
   }
 }

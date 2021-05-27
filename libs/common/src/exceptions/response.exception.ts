@@ -1,18 +1,21 @@
 import * as ip from 'ip'
 import * as os from 'os'
-import { ApiExceptionType, ResponseExceptionType } from '@my-guardian-api/common/types'
+import {
+  ApiExceptionType,
+  ResponseExceptionType,
+} from '@my-guardian-api/common/types'
 
 export class ResponseException {
   constructor({
-                module,
-                type,
-                actionType,
-                path,
-                codes = [],
-                requestId,
-                method,
-                statusCode
-              }: ApiExceptionType & ResponseExceptionType) {
+    module,
+    type,
+    actionType,
+    path,
+    codes = [],
+    requestId,
+    method,
+    statusCode,
+  }: ApiExceptionType & ResponseExceptionType) {
     this.statusCode = statusCode
     this.method = method
     this.requestId = requestId

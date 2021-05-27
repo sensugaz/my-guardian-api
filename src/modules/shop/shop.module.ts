@@ -7,19 +7,8 @@ import { QueryHandlers } from './queries'
 import { GoogleMapModule } from '@my-guardian-api/google-map'
 
 @Module({
-  imports: [
-    CommonModule,
-    DatabaseModule,
-    GoogleMapModule
-  ],
-  controllers: [
-    ShopController
-  ],
-  providers: [
-    ...CommandHandlers,
-    ...QueryHandlers
-  ]
+  imports: [CommonModule, DatabaseModule, GoogleMapModule],
+  controllers: [ShopController],
+  providers: [...CommandHandlers, ...QueryHandlers],
 })
-export class ShopModule {
-
-}
+export class ShopModule {}

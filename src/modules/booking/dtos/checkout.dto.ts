@@ -11,5 +11,5 @@ export class CheckoutDto {
   priceId: string
 
   @IsOptional()
-  voucherCode ?: string
+  voucherCode?: string
 }

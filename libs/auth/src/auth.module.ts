@@ -13,19 +13,12 @@ import { JwtStrategy } from '@my-guardian-api/auth/strategies/jwt'
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET')
+        secret: configService.get<string>('JWT_SECRET'),
       }),
-      inject: [ConfigService]
-    })
+      inject: [ConfigService],
+    }),
   ],
-  providers: [
-    JwtStrategy
-  ],
-  exports: [
-    PassportModule,
-    JwtStrategy,
-    JwtModule
-  ]
+  providers: [JwtStrategy],
+  exports: [PassportModule, JwtStrategy, JwtModule],
 })
-export class AuthModule {
-}
+export class AuthModule {}

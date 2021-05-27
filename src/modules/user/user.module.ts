@@ -8,17 +8,8 @@ import { AuthModule } from '@my-guardian-api/auth'
 import { QueryHandlers } from './queries'
 
 @Module({
-  imports: [
-    CommonModule,
-    DatabaseModule,
-    MailerModule,
-    AuthModule
-  ],
+  imports: [CommonModule, DatabaseModule, MailerModule, AuthModule],
   controllers: [UserController],
-  providers: [
-    ...CommandHandlers,
-    ...QueryHandlers
-  ]
+  providers: [...CommandHandlers, ...QueryHandlers],
 })
-export class UserModule {
-}
+export class UserModule {}

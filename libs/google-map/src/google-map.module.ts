@@ -3,12 +3,8 @@ import { GoogleMapService } from './google-map.service'
 import { CommonModule } from '@my-guardian-api/common'
 
 @Module({
-  imports: [
-    CommonModule,
-    HttpModule
-  ],
+  imports: [CommonModule, HttpModule],
   providers: [GoogleMapService],
-  exports: [GoogleMapService]
+  exports: [GoogleMapService],
 })
-export class GoogleMapModule {
-}
+export class GoogleMapModule {}

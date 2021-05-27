@@ -6,18 +6,8 @@ import { QueryHandlers } from './queries'
 import { CommandHandlers } from './commands'
 
 @Module({
-  imports: [
-    CommonModule,
-    DatabaseModule
-  ],
-  controllers: [
-    CustomerController
-  ],
-  providers: [
-    ...QueryHandlers,
-    ...CommandHandlers
-  ]
+  imports: [CommonModule, DatabaseModule],
+  controllers: [CustomerController],
+  providers: [...QueryHandlers, ...CommandHandlers],
 })
-export class CustomerModule {
-
-}
+export class CustomerModule {}

@@ -10,7 +10,7 @@ import {
   Query,
   Redirect,
   Req,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
@@ -22,7 +22,7 @@ import {
   LoginDto,
   RegisterDto,
   ResetPasswordDto,
-  UpdateProfileDto
+  UpdateProfileDto,
 } from '../dtos'
 import { UserModel, UserTokenModel } from '@my-guardian-api/database'
 import {
@@ -33,7 +33,7 @@ import {
   LoginCommand,
   RegisterCommand,
   ResetPasswordCommand,
-  UpdateProfileCommand
+  UpdateProfileCommand,
 } from '../commands/command'
 import { AuthGuard } from '@nestjs/passport'
 import { CheckTokenQuery, ProfileQuery } from '../queries/query'
@@ -44,9 +44,10 @@ import { ApiException, RoleEnum } from '@my-guardian-api/common'
 @ApiTags('users')
 @Controller('/users')
 export class UserController {
-  constructor(private readonly commandBus: CommandBus,
-              private readonly queryBus: QueryBus) {
-  }
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
@@ -63,7 +64,7 @@ export class UserController {
   @Get('/activate')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
   activate(@Query() token: ActivateDto): Promise<UserModel> {
     return this.commandBus.execute(new ActivateCommand(token))
@@ -78,9 +79,12 @@ export class UserController {
   @Post('/reset-password')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
-  resetPassword(@Query() query: { token: string }, @Body() body: ResetPasswordDto): Promise<UserModel> {
+  resetPassword(
+    @Query() query: { token: string },
+    @Body() body: ResetPasswordDto,
+  ): Promise<UserModel> {
     return this.commandBus.execute(new ResetPasswordCommand(query, body))
   }
 
@@ -96,7 +100,10 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard(['jwt']))
   @HttpCode(HttpStatus.OK)
-  changePassword(@Req() req, @Body() body: ChangePasswordDto): Promise<UserModel> {
+  changePassword(
+    @Req() req,
+    @Body() body: ChangePasswordDto,
+  ): Promise<UserModel> {
     return this.commandBus.execute(new ChangePasswordCommand(req.user, body))
   }
 
@@ -114,23 +121,27 @@ export class UserController {
   @UseGuards(AuthGuard(['jwt']), RolesGuard)
   @Roles(RoleEnum.CUSTOMER)
   @HttpCode(HttpStatus.OK)
-  updateProfile(@Req() req, @Body() body: UpdateProfileDto): Promise<UserModel> {
+  updateProfile(
+    @Req() req,
+    @Body() body: UpdateProfileDto,
+  ): Promise<UserModel> {
     return this.commandBus.execute(new UpdateProfileCommand(req.user, body))
   }
 
   @Get('/redirect')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
   @ApiQuery({
     name: 'type',
-    required: true
+    required: true,
   })
   @Redirect('', HttpStatus.MOVED_PERMANENTLY)
-  redirect(@Req() req, @Query() query: { type: string, token: string }) {
+  redirect(@Req() req, @Query() query: { type: string; token: string }) {
     const useragent = req.useragent
-    let mobileUrl, webUrl = null
+    let mobileUrl,
+      webUrl = null
 
     switch (query.type) {
       case 'register':
@@ -146,7 +157,7 @@ export class UserController {
           type: 'application',
           module: 'user',
           codes: ['invalid_type'],
-          statusCode: HttpStatus.BAD_REQUEST
+          statusCode: HttpStatus.BAD_REQUEST,
         })
     }
     if (useragent.isMobile || useragent.isMobileNative) {
@@ -159,7 +170,7 @@ export class UserController {
   @Get('/check-token')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
   checkToken(@Query() query: CheckTokenDto): Promise<UserTokenModel> {
     return this.queryBus.execute(new CheckTokenQuery(query))

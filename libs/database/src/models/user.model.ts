@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm'
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from 'typeorm'
 import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { UserTokenModel } from '@my-guardian-api/database/models/user-token.model'
 import { ApiHideProperty } from '@nestjs/swagger'
@@ -21,28 +28,28 @@ export class UserModel extends BaseModel {
   salt: string
 
   @Column({
-    name: 'is_activate'
+    name: 'is_activate',
   })
   isActivate: boolean
 
   @ApiHideProperty()
-  @OneToMany(() => UserTokenModel, x => x.user, {
-    cascade: true
+  @OneToMany(() => UserTokenModel, (x) => x.user, {
+    cascade: true,
   })
   tokens: UserTokenModel[]
 
-  @ManyToOne(() => RoleModel, x => x.user, {
+  @ManyToOne(() => RoleModel, (x) => x.user, {
     cascade: ['insert', 'update'],
-    eager: true
+    eager: true,
   })
   @JoinColumn({
-    name: 'role_id'
+    name: 'role_id',
   })
   role: RoleModel
 
   @ApiHideProperty()
-  @OneToMany(() => VoucherHistoryModel, x => x.user, {
-    cascade: true
+  @OneToMany(() => VoucherHistoryModel, (x) => x.user, {
+    cascade: true,
   })
   vouchers: VoucherHistoryModel[]
 
@@ -60,7 +67,7 @@ export class UserModel extends BaseModel {
         module: 'common',
         type: 'domain',
         codes: ['user_already_activated'],
-        statusCode: 400
+        statusCode: 400,
       })
     }
 

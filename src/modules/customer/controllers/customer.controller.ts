@@ -1,11 +1,25 @@
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common'
 import { PaginationDto, RoleEnum } from '@my-guardian-api/common'
 import { UserModel } from '@my-guardian-api/database'
 import { Pagination } from 'nestjs-typeorm-paginate'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { GetCustomerByIdQuery, GetCustomerQuery } from '../queries/query'
-import { CreateCustomerCommand, DeleteCustomerCommand } from '../commands/command'
+import {
+  CreateCustomerCommand,
+  DeleteCustomerCommand,
+} from '../commands/command'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { AuthGuard } from '@nestjs/passport'
 import { Roles } from '@my-guardian-api/auth/decorators'
@@ -17,9 +31,10 @@ import { CreateCustomerDto } from '../dtos'
 @UseGuards(AuthGuard(['jwt']), RolesGuard)
 @Roles(RoleEnum.ADMIN)
 export class CustomerController {
-  constructor(private readonly commandBus: CommandBus,
-              private readonly queryBus: QueryBus) {
-  }
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post()
   createCustomer(@Body() body: CreateCustomerDto): Promise<UserModel> {
@@ -29,21 +44,25 @@ export class CustomerController {
   @Get()
   @ApiQuery({
     name: 'query',
-    required: false
+    required: false,
   })
-  getCustomer(@Query('query') query: string,
-              @Query() param: PaginationDto): Promise<Pagination<UserModel>> {
+  getCustomer(
+    @Query('query') query: string,
+    @Query() param: PaginationDto,
+  ): Promise<Pagination<UserModel>> {
     const { page, limit, sort, orderBy } = param
-    return this.queryBus.execute(new GetCustomerQuery(query, sort, orderBy, {
-      page: page ? page : 1,
-      limit: limit > 100 ? 100 : limit
-    }))
+    return this.queryBus.execute(
+      new GetCustomerQuery(query, sort, orderBy, {
+        page: page ? page : 1,
+        limit: limit > 100 ? 100 : limit,
+      }),
+    )
   }
 
   @Get(':userId')
   @ApiParam({
     name: 'userId',
-    required: this
+    required: this,
   })
   getCustomerById(@Param('userId') userId: string): Promise<UserModel> {
     return this.queryBus.execute(new GetCustomerByIdQuery(userId))
@@ -52,7 +71,7 @@ export class CustomerController {
   @Delete(':userId')
   @ApiParam({
     name: 'userId',
-    required: this
+    required: this,
   })
   @HttpCode(HttpStatus.OK)
   deleteCustomer(@Param('userId') userId: string): Promise<UserModel> {

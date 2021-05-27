@@ -6,23 +6,26 @@ import { ApiException, TokenTypeEnum } from '@my-guardian-api/common'
 
 @CommandHandler(ActivateCommand)
 export class ActivateHandler implements ICommandHandler<ActivateCommand> {
-  constructor(private readonly entityManager: EntityManager) {
-  }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async execute({ query }: ActivateCommand): Promise<UserModel> {
-    const token = await this.entityManager.findOne(UserTokenModel, {
-      token: query.token,
-      type: TokenTypeEnum.REGISTER
-    }, {
-      relations: ['user']
-    })
+    const token = await this.entityManager.findOne(
+      UserTokenModel,
+      {
+        token: query.token,
+        type: TokenTypeEnum.REGISTER,
+      },
+      {
+        relations: ['user'],
+      },
+    )
 
     if (!token) {
       throw new ApiException({
         module: 'user',
         type: 'application',
         codes: ['token_not_found'],
-        statusCode: 400
+        statusCode: 400,
       })
     }
 
@@ -31,7 +34,7 @@ export class ActivateHandler implements ICommandHandler<ActivateCommand> {
         module: 'user',
         type: 'application',
         codes: ['user_not_found'],
-        statusCode: 400
+        statusCode: 400,
       })
     }
 
@@ -47,5 +50,4 @@ export class ActivateHandler implements ICommandHandler<ActivateCommand> {
 
     return token.user
   }
-
 }

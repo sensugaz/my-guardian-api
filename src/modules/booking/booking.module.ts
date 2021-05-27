@@ -12,9 +12,9 @@ import {
   VoucherHistoryRepository,
   VoucherRepository
 } from '@my-guardian-api/database/repositories'
-import { CheckoutHandler } from './commands/handler'
 import { StripeModule } from 'nestjs-stripe'
 import { ConfigService } from '@nestjs/config'
+import { CommandHandlers } from './commands'
 
 @Module({
   imports: [
@@ -38,8 +38,10 @@ import { ConfigService } from '@nestjs/config'
     })
   ],
   controllers: [BookingController],
-  providers: [CheckoutHandler]
+  providers: [
+    ...CommandHandlers
+  ]
 })
 export class BookingModule {
-
+  
 }
