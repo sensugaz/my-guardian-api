@@ -19,7 +19,8 @@ export class BookingModel extends BaseModel {
   customer: CustomerModel
 
   @Column({
-    name: 'voucher_code'
+    name: 'voucher_code',
+    nullable: true
   })
   voucherCode: string
 

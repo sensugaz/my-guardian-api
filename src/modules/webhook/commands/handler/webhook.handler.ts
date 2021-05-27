@@ -35,7 +35,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
       case 'payment_intent.succeeded':
         booking.updatePaymentStatus(PaymentStatusEnum.PAID)
         booking.updateBookingStatus(BookingStatusEnum.COMPLETED)
-        
+
         booking.shop.decAvailable(booking.qty)
 
         await this.shopRepository.save(booking.shop)
@@ -64,5 +64,4 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
 
     return await this.bookingRepository.save(booking)
   }
-
 }

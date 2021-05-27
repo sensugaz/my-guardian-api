@@ -17,6 +17,7 @@ export class StripeMiddleware implements NestMiddleware {
     // if (!sig) {
     //   throw new UnauthorizedException()
     // }
+    Logger.debug(req)
     Logger.debug(sig)
     Logger.debug(secret)
 
