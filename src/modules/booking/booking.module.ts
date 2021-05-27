@@ -15,6 +15,7 @@ import {
 import { StripeModule } from 'nestjs-stripe'
 import { ConfigService } from '@nestjs/config'
 import { CommandHandlers } from './commands'
+import { QueryHandlers } from './queries'
 
 @Module({
   imports: [
@@ -39,9 +40,10 @@ import { CommandHandlers } from './commands'
   ],
   controllers: [BookingController],
   providers: [
-    ...CommandHandlers
+    ...CommandHandlers,
+    ...QueryHandlers
   ]
 })
 export class BookingModule {
-  
+
 }

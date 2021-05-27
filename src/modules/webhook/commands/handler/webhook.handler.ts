@@ -3,7 +3,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { BookingRepository, ShopRepository, VoucherHistoryRepository } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
-import { HttpStatus } from '@nestjs/common'
+import { HttpStatus, Logger } from '@nestjs/common'
+import { BookingModel } from '@my-guardian-api/database'
 
 @CommandHandler(WebhookCommand)
 export class WebhookHandler implements ICommandHandler<WebhookCommand> {
@@ -15,7 +16,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
               private readonly voucherHistoryRepository: VoucherHistoryRepository) {
   }
 
-  async execute({ body }: WebhookCommand): Promise<any> {
+  async execute({ body }: WebhookCommand): Promise<BookingModel> {
     const booking = await this.bookingRepository.findOne({
       id: body.data?.object?.metadata?.bookingId
     }, {
@@ -43,6 +44,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         await this.shopRepository.save(booking.shop)
 
         if (!booking.voucherCode) {
+          Logger.debug('WTF')
           await this.voucherHistoryRepository.save(this.voucherHistoryRepository.create({
             user: {
               id: booking.customer.userId
@@ -63,8 +65,6 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         booking.updateBookingStatus(BookingStatusEnum.FAILED)
         break
     }
-
-    console.log(booking)
 
     return await this.bookingRepository.save(booking)
   }

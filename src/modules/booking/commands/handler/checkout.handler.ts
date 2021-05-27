@@ -106,7 +106,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
 
     if (body.voucherCode) {
       const voucher = await this.voucherRepository.findOne({
-        code: body.voucherCode
+        code: body.voucherCode.toUpperCase()
       })
 
       if (!voucher) {
