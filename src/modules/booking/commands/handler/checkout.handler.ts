@@ -34,7 +34,8 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
                 }: CheckoutCommand): Promise<{
     paymentIntent: string
     ephemeralKey: string
-    customer: string
+    customer: string,
+    bookingId: string
   }> {
     let customer = await this.customerRepository.findOne({
       userId: user.id
@@ -120,7 +121,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
 
     const totalAmount = Number(amount) - discount
 
-    await this.bookingRepository.save(
+    const booking = await this.bookingRepository.save(
       this.bookingRepository.create({
         shop: shop,
         customer: customer,
@@ -130,6 +131,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         scheduleCloseTime: schedule.closeTime,
         type: price.name,
         amount: amount,
+        qty: price.qty,
         discount: discount,
         totalAmount: totalAmount,
         paymentStatus: PaymentStatusEnum.PENDING,
@@ -153,14 +155,15 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       currency: 'eur',
       customer: customer.stripeCustomerId,
       metadata: {
-        bookingId: 'TEST'
+        bookingId: booking.id
       }
     })
 
     return {
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
-      customer: customer.stripeCustomerId
+      customer: customer.stripeCustomerId,
+      bookingId: booking.id
     }
   }
 }
