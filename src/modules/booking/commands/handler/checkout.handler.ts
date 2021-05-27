@@ -37,6 +37,8 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
     customer: string,
     bookingId: string
   }> {
+    console.log('booking => ', body)
+
     let customer = await this.customerRepository.findOne({
       userId: user.id
     })

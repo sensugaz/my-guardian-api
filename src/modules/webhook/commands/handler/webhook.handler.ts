@@ -64,6 +64,8 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         break
     }
 
+    console.log(booking)
+
     return await this.bookingRepository.save(booking)
   }
 }
