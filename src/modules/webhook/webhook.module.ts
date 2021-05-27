@@ -8,7 +8,12 @@ import { CommonModule } from '@my-guardian-api/common'
 import { DatabaseModule } from '@my-guardian-api/database'
 import { MailerModule } from '@my-guardian-api/mailer'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { BookingRepository, ShopRepository, VoucherHistoryRepository } from '@my-guardian-api/database/repositories'
+import {
+  BookingRepository,
+  ShopRepository,
+  UserRepository,
+  VoucherHistoryRepository
+} from '@my-guardian-api/database/repositories'
 
 @Module({
   imports: [
@@ -25,7 +30,8 @@ import { BookingRepository, ShopRepository, VoucherHistoryRepository } from '@my
     TypeOrmModule.forFeature([
       BookingRepository,
       VoucherHistoryRepository,
-      ShopRepository
+      ShopRepository,
+      UserRepository
     ])
   ],
   controllers: [WebhookController],

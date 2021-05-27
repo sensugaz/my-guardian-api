@@ -27,8 +27,6 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
     switch (query.user.role.key) {
       case 'CUSTOMER':
         const customer = await this.customerRepository.findOne({ userId: query.user.id })
-        console.log(customer)
-
         queryBuilder = queryBuilder.where('booking.customer.id = :customerId', { customerId: customer.id })
         break
       case 'SHOP':

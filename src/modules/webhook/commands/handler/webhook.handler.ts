@@ -1,10 +1,16 @@
 import { WebhookCommand } from '../command'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { BookingRepository, ShopRepository, VoucherHistoryRepository } from '@my-guardian-api/database/repositories'
+import {
+  BookingRepository,
+  ShopRepository,
+  UserRepository,
+  VoucherHistoryRepository
+} from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
 import { HttpStatus, Logger } from '@nestjs/common'
 import { BookingModel } from '@my-guardian-api/database'
+import { MailerService } from '@my-guardian-api/mailer'
 
 @CommandHandler(WebhookCommand)
 export class WebhookHandler implements ICommandHandler<WebhookCommand> {
@@ -13,7 +19,10 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
               @InjectRepository(ShopRepository)
               private readonly shopRepository: ShopRepository,
               @InjectRepository(VoucherHistoryRepository)
-              private readonly voucherHistoryRepository: VoucherHistoryRepository) {
+              private readonly voucherHistoryRepository: VoucherHistoryRepository,
+              @InjectRepository(UserRepository)
+              private readonly userRepository: UserRepository,
+              private readonly mailerService: MailerService) {
   }
 
   async execute({ body }: WebhookCommand): Promise<BookingModel> {
@@ -64,6 +73,14 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
         booking.updateBookingStatus(BookingStatusEnum.FAILED)
         break
+    }
+
+    const user = await this.userRepository.findOne({ id: booking.shop.userId })
+
+    if (booking.qty == 1) {
+      await this.mailerService.sendWithTemplate(user.email, 'New order solo offer', {}, 'solo-booking')
+    } else {
+      await this.mailerService.sendWithTemplate(user.email, 'New order duo offer', {}, 'duo-booking')
     }
 
     return await this.bookingRepository.save(booking)
