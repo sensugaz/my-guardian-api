@@ -1,15 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, UseGuards } from '@nestjs/common'
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { CheckoutCommand } from '../commands/command'
+import { CheckoutCommand, DroppedCommand, WithdrawCommand } from '../commands/command'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Roles } from '@my-guardian-api/auth/decorators'
 import { PaginationDto, RoleEnum } from '@my-guardian-api/common'
-import { CheckoutDto } from '../dtos'
+import { CheckoutDto, DroppedDto } from '../dtos'
 import { Pagination } from 'nestjs-typeorm-paginate'
 import { BookingModel } from '@my-guardian-api/database'
-import { GetBookingQuery } from '../queries/query'
+import { GetBookingByIdQuery, GetBookingQuery } from '../queries/query'
 
 @ApiTags('bookings')
 @Controller('/bookings')
@@ -42,5 +42,37 @@ export class BookingController {
         limit: limit > 100 ? 100 : limit
       })
     )
+  }
+
+  @Put('/:id/dropped')
+  @ApiParam({
+    name: 'id',
+    required: true
+  })
+  @Roles(RoleEnum.CUSTOMER)
+  @HttpCode(HttpStatus.OK)
+  dropped(@Req() req, @Param('id') id: string, @Body() body: DroppedDto): Promise<BookingModel> {
+    return this.commandBus.execute(new DroppedCommand(req.user, id, body))
+  }
+
+  @Put('/:id/withdraw')
+  @ApiParam({
+    name: 'id',
+    required: true
+  })
+  @Roles(RoleEnum.CUSTOMER)
+  @HttpCode(HttpStatus.OK)
+  withdraw(@Req() req, @Param('id') id: string): Promise<BookingModel> {
+    return this.commandBus.execute(new WithdrawCommand(req.user, id))
+  }
+
+  @Get(':id')
+  @ApiParam({
+    name: 'id',
+    required: this
+  })
+  @Roles(RoleEnum.ADMIN)
+  getBookingById(@Req() req, @Param('id') id: string): Promise<BookingModel> {
+    return this.queryBus.execute(new GetBookingByIdQuery(req.user, id))
   }
 }

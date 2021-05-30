@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { ShopModel } from '@my-guardian-api/database/models/shop.model'
 import { CustomerModel } from '@my-guardian-api/database/models/customer.model'
-import { BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
+import { BookingBagStatusEnum, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
+import { BookingBagModel } from '@my-guardian-api/database/models/booking-bag.model'
 
 @Entity('bookings')
 export class BookingModel extends BaseModel {
@@ -79,11 +80,39 @@ export class BookingModel extends BaseModel {
   })
   bookingStatus: BookingStatusEnum
 
+  @Column({
+    type: 'varchar',
+    name: 'booking_bag_status'
+  })
+  bookingBagStatus: BookingBagStatusEnum
+
+  @OneToMany(() => BookingBagModel, (x) => x.booking, {
+    cascade: true,
+    eager: true
+  })
+  bags: BookingBagModel[]
+
   updatePaymentStatus(status: PaymentStatusEnum) {
     this.paymentStatus = status
   }
 
   updateBookingStatus(status: BookingStatusEnum) {
     this.bookingStatus = status
+  }
+
+  dropped(bag: BookingBagModel) {
+    if (!bag) {
+      this.bags = []
+    }
+
+    this.bags.push(bag)
+  }
+
+  withdraw() {
+    for (const bag of this.bags) {
+      bag.withdraw()
+    }
+
+    this.bookingBagStatus = BookingBagStatusEnum.WITHDRAW
   }
 }

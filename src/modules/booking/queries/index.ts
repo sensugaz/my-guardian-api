@@ -1,5 +1,6 @@
-import { GetBookingHandler } from './handler'
+import { GetBookingByIdHandler, GetBookingHandler } from './handler'
 
 export const QueryHandlers = [
-  GetBookingHandler
+  GetBookingHandler,
+  GetBookingByIdHandler
 ]

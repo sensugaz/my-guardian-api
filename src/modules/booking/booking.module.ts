@@ -6,6 +6,7 @@ import { MailerModule } from '@my-guardian-api/mailer'
 import { AuthModule } from '@my-guardian-api/auth'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import {
+  BookingBagRepository,
   BookingRepository,
   CustomerRepository,
   ShopRepository,
@@ -28,7 +29,8 @@ import { QueryHandlers } from './queries'
       CustomerRepository,
       VoucherRepository,
       VoucherHistoryRepository,
-      ShopRepository
+      ShopRepository,
+      BookingBagRepository
     ]),
     StripeModule.forRootAsync({
       inject: [ConfigService],
