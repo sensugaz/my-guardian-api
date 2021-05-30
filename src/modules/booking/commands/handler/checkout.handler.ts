@@ -168,6 +168,12 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       // }
     )
 
+    console.log({
+      paymentIntent: paymentIntent.client_secret,
+      ephemeralKey: ephemeralKey.secret,
+      customer: customer.stripeCustomerId
+    })
+
     return {
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
