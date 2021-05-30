@@ -53,7 +53,8 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         await this.shopRepository.save(booking.shop)
 
         if (!booking.voucherCode) {
-          Logger.debug('WTF')
+          Logger.debug('OK')
+          console.log(booking)
           await this.voucherHistoryRepository.save(this.voucherHistoryRepository.create({
             user: {
               id: booking.customer.userId
