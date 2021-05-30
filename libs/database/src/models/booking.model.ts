@@ -82,7 +82,8 @@ export class BookingModel extends BaseModel {
 
   @Column({
     type: 'varchar',
-    name: 'booking_bag_status'
+    name: 'booking_bag_status',
+    nullable: true
   })
   bookingBagStatus: BookingBagStatusEnum
 
