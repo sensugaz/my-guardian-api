@@ -6,10 +6,19 @@ import { CommonModule } from '@my-guardian-api/common'
 import { MailerModule } from '@my-guardian-api/mailer'
 import { AuthModule } from '@my-guardian-api/auth'
 import { QueryHandlers } from './queries'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { UserRepository } from '@my-guardian-api/database/repositories'
 
 @Module({
-  imports: [CommonModule, DatabaseModule, MailerModule, AuthModule],
+  imports: [
+    CommonModule,
+    DatabaseModule,
+    MailerModule,
+    AuthModule,
+    TypeOrmModule.forFeature([UserRepository])
+  ],
   controllers: [UserController],
-  providers: [...CommandHandlers, ...QueryHandlers],
+  providers: [...CommandHandlers, ...QueryHandlers]
 })
-export class UserModule {}
+export class UserModule {
+}

@@ -1,3 +1,3 @@
-import { CheckTokenHandler, ProfileHandler } from './handler'
+import { CheckEmailHandler, CheckTokenHandler, ProfileHandler } from './handler'
 
-export const QueryHandlers = [ProfileHandler, CheckTokenHandler]
+export const QueryHandlers = [ProfileHandler, CheckTokenHandler, CheckEmailHandler]

@@ -36,7 +36,7 @@ import {
   UpdateProfileCommand
 } from '../commands/command'
 import { AuthGuard } from '@nestjs/passport'
-import { CheckTokenQuery, ProfileQuery } from '../queries/query'
+import { CheckEmailQuery, CheckTokenQuery, ProfileQuery } from '../queries/query'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Roles } from '@my-guardian-api/auth/decorators'
 import { ApiException, RoleEnum } from '@my-guardian-api/common'
@@ -175,5 +175,14 @@ export class UserController {
   })
   checkToken(@Query() query: CheckTokenDto): Promise<UserTokenModel> {
     return this.queryBus.execute(new CheckTokenQuery(query))
+  }
+
+  @Get('/check-email')
+  @ApiQuery({
+    name: 'email',
+    required: true
+  })
+  checkEmail(@Query('email') email: string): Promise<{ exists: boolean }> {
+    return this.queryBus.execute(new CheckEmailQuery(email))
   }
 }

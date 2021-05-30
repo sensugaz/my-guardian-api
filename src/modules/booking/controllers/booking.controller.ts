@@ -71,7 +71,6 @@ export class BookingController {
     name: 'id',
     required: this
   })
-  @Roles(RoleEnum.ADMIN)
   getBookingById(@Req() req, @Param('id') id: string): Promise<BookingModel> {
     return this.queryBus.execute(new GetBookingByIdQuery(req.user, id))
   }

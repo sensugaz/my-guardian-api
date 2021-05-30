@@ -22,6 +22,7 @@ export class GetBookingByIdHandler implements IQueryHandler<GetBookingByIdQuery>
       .createQueryBuilder(tableName)
       .leftJoinAndSelect('booking.customer', 'customer')
       .leftJoinAndSelect('booking.shop', 'shop')
+      .leftJoinAndSelect('booking.bags', 'bags')
       .withDeleted()
 
     switch (query.user.role.key) {
@@ -35,7 +36,7 @@ export class GetBookingByIdHandler implements IQueryHandler<GetBookingByIdQuery>
         break
     }
 
-    const booking = queryBuilder.findOne()
+    const booking = queryBuilder.getOne()
 
     if (!booking) {
       throw new ApiException({
