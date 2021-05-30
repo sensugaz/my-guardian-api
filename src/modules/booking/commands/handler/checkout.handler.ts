@@ -159,13 +159,13 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         customer: customer.stripeCustomerId,
         metadata: {
           bookingId: booking.id
-        },
-        use_stripe_sdk: true,
-        confirmation_method: 'manual'
-      },
-      {
-        stripeAccount: 'acct_1IVlMiCifXg5OoAD'
+        }
+        // use_stripe_sdk: true,
+        // confirmation_method: 'manual'
       }
+      // {
+      //   stripeAccount: 'acct_1IVlMiCifXg5OoAD'
+      // }
     )
 
     return {
