@@ -8,7 +8,7 @@ import {
 } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
-import { HttpStatus, Logger } from '@nestjs/common'
+import { HttpStatus } from '@nestjs/common'
 import { BookingModel } from '@my-guardian-api/database'
 import { MailerService } from '@my-guardian-api/mailer'
 
@@ -32,8 +32,6 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
       relations: ['shop', 'customer']
     })
 
-    console.log(booking)
-
     if (!booking) {
       throw new ApiException({
         type: 'application',
@@ -52,9 +50,9 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
 
         await this.shopRepository.save(booking.shop)
 
+        console.log('booking.voucherCode => ', booking.voucherCode)
+
         if (!booking.voucherCode) {
-          Logger.debug('OK')
-          console.log(booking)
           await this.voucherHistoryRepository.save(this.voucherHistoryRepository.create({
             user: {
               id: booking.customer.userId
