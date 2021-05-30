@@ -164,6 +164,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
           bookingId: booking.id,
         },
         use_stripe_sdk: true,
+        confirmation_method: 'manual',
       },
       {
         stripeAccount: 'acct_1IVlMiCifXg5OoAD',
