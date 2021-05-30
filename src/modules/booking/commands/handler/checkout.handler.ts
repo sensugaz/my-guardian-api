@@ -163,6 +163,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         metadata: {
           bookingId: booking.id,
         },
+        use_stripe_sdk: true,
       },
       {
         stripeAccount: 'acct_1IVlMiCifXg5OoAD',
