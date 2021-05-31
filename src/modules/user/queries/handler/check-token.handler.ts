@@ -6,11 +6,12 @@ import { ApiException } from '@my-guardian-api/common'
 
 @QueryHandler(CheckTokenQuery)
 export class CheckTokenHandler implements IQueryHandler<CheckTokenQuery> {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(private readonly entityManager: EntityManager) {
+  }
 
   async execute({ query }: CheckTokenQuery): Promise<UserTokenModel> {
     const token = await this.entityManager.findOne(UserTokenModel, {
-      token: query.token,
+      token: query
     })
 
     if (!token) {
@@ -18,7 +19,7 @@ export class CheckTokenHandler implements IQueryHandler<CheckTokenQuery> {
         module: 'user',
         type: 'application',
         codes: ['token_not_found'],
-        statusCode: 400,
+        statusCode: 400
       })
     }
 

@@ -6,7 +6,8 @@ import {
   LoginHandler,
   RegisterHandler,
   ResetPasswordHandler,
-  UpdateProfileHandler,
+  UpdateDeviceIdHandler,
+  UpdateProfileHandler
 } from './handler'
 
 export const CommandHandlers = [
@@ -18,4 +19,5 @@ export const CommandHandlers = [
   ChangePasswordHandler,
   DeleteUserHandler,
   UpdateProfileHandler,
+  UpdateDeviceIdHandler
 ]

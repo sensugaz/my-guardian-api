@@ -17,11 +17,11 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import {
   ActivateDto,
   ChangePasswordDto,
-  CheckTokenDto,
   ForgotPasswordDto,
   LoginDto,
   RegisterDto,
   ResetPasswordDto,
+  UpdateDeviceDto,
   UpdateProfileDto
 } from '../dtos'
 import { UserModel, UserTokenModel } from '@my-guardian-api/database'
@@ -33,6 +33,7 @@ import {
   LoginCommand,
   RegisterCommand,
   ResetPasswordCommand,
+  UpdateDeviceIdCommand,
   UpdateProfileCommand
 } from '../commands/command'
 import { AuthGuard } from '@nestjs/passport'
@@ -129,6 +130,18 @@ export class UserController {
     return this.commandBus.execute(new UpdateProfileCommand(req.user, body))
   }
 
+  @Put('/device-id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(['jwt']), RolesGuard)
+  @Roles(RoleEnum.CUSTOMER)
+  @HttpCode(HttpStatus.OK)
+  updateDeviceId(
+    @Req() req,
+    @Body() body: UpdateDeviceDto
+  ): Promise<UserModel> {
+    return this.commandBus.execute(new UpdateDeviceIdCommand(req.user, body))
+  }
+
   @Get('/redirect')
   @ApiQuery({
     name: 'token',
@@ -173,8 +186,8 @@ export class UserController {
     name: 'token',
     required: true
   })
-  checkToken(@Query() query: CheckTokenDto): Promise<UserTokenModel> {
-    return this.queryBus.execute(new CheckTokenQuery(query))
+  checkToken(@Query('token') token: string): Promise<UserTokenModel> {
+    return this.queryBus.execute(new CheckTokenQuery(token))
   }
 
   @Get('/check-email')
