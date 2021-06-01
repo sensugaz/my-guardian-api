@@ -5,6 +5,7 @@ import { CommonModule } from '@my-guardian-api/common'
 import { DatabaseModule } from '@my-guardian-api/database'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { BookingRepository, CustomerRepository, UserRepository } from '@my-guardian-api/database/repositories'
+import { NotificationController } from './notification.controller'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { BookingRepository, CustomerRepository, UserRepository } from '@my-guard
       BookingRepository
     ])
   ],
+  controllers: [NotificationController],
   providers: [NotificationService]
 })
 export class NotificationModule {
