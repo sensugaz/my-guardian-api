@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "the-guardian-312312",
+  "private_key_id": "6c869afb803e1343500eeb07ea9bbdeb923d7878",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCXWURyy4CLvNZB\naxLMijGO0HKOJUlL/wsF2Qmk3+TwR6l56lOPKA8OJpjqQjUfi754+twLic0fio6p\ndY25VdBK2jiWovnb6Fr0nqzUfMm/kDsZ5YluL8IpJvs+FMsTJqtMGy4QEqMQ0jck\n2DabDsrYGZpHK8N+u+inx1b6+hsIgL2/CwSE6nf3UgR2yEC65mwrD5xHOoVzCgFd\nOMhCk76JxlohuaxZ+i9xzF+VTUwCSdKttFZgboEMyTlWljWMl8XG/rTVHCSZXL50\n6UGRdH+g/RP+riUKgneZdnGf8xWGG67AoSyVEl8ToU0p4s7VU3RlKX0x1TnUKpvF\nioUs6l6zAgMBAAECggEAAObcxAxXXz3ITwp6ybI3GmE+lX8+YRALekTxTESzQgVD\nSsEtL0ivUkfDmH29gEseXu0ru3veN4ZlVDgpmIWc4J1NQgSFlZxcUmHRqNB3iUcs\nOvrFp1zsfL9JNvT7wsjzs1fkHd9mjlaaUoNhS+o6JjB83Viy6QHooHtNFuC/oXzU\njANShzLsMzCy84YJSnoaaMl8Muy99jEYIobM5bziaKGUi5uqaIC/y5+UW3jPe9ct\nKImMD0M50Dujuccb2xzY2w04PGOn9wdGua8qdAnB2i3ZjWEURjZv6shBrlm1ShCA\nfzf4KZLpMTrNfa0Q2irB516eSXnENm5RZeQT2SmCTQKBgQDIJwdW0NFwXEpxHzcv\n4/NSIm9Y7fOY2TGlw18ftdiwz6gpg5BlfKYrEHWSt+FIpDuBAzDx6V7GWBi5Gvrf\npy+CtNzUGt9DwHqVJsJWPXtjWob0MjdQld5N+219rOPCQ00rQCbqH7xodsrmnHva\nss+qvawQvfzUr8aQTxZDAMmgFQKBgQDBlCqocerg2lu5OBuDOlZ+vFJCbKex+InN\nl0U4wAIWPT02uOa5znmETMVGxGZ4SaDW7zagkxBVxmuxdGwL/9Mj/2YyRkXS9ZID\n9rRuotTMVmPxwjd3gE2K01mcsEOt4O+UZu6zhAm+JDdHwSesMoEed55tX9C7jEdP\n1TMzQ9JtpwKBgQCykQdeL9y61svfUo8k3cTGYUxf1aL/mb5OehhSrSUO0aTgrKzV\nrjh9sSiD5iNKcKNZvWQcXy0b3ZrpAiYSBRFBFmTxoqvPwVhb2wGEeUOs5yYBlQ9+\niMaVYhxUBDwKo4qkbI6LUBcCSAFLbw6clezqEmABa862Xb/UHYrp6jj35QKBgQCk\nQpEMDFZNZJyuh5C5AvjAZBa9LKwD1a1BWlovtKZQrrhRxgZqpmzwuaAw05lL+tZT\na/sDuKcE0fEyTGMer38/rYnPoVfAkgbL/DzRILTHi4sVa0Nb0PB7m6oPznYvho5l\ndA6bH7CQuvR5m8qJUPXFn6U8lDBv5LHiaTwgBS37QwKBgQCFrFDHUi3X6fNmRh3v\nhk041LketYjHQCFNpTGQvUb/heMyz4mL0LXXTfkAP0n4xMyWSbq3LHOZ5IXxcDqI\n0sGo3/Au9oga6S/4wG/T+v395SCHF6XUl30bg3heTayn71FRJZypTvs+LTKIdwxt\nnmN30uoE9cF3je6yvtmRZ+2hLw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-jyibz@the-guardian-312312.iam.gserviceaccount.com",
+  "client_id": "114291815822399173859",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-jyibz%40the-guardian-312312.iam.gserviceaccount.com"
+}

@@ -1,6 +1,13 @@
 import { Module } from '@nestjs/common'
-import { BookingModule, CustomerModule, ShopModule, UserModule, VoucherModule } from './modules'
-import { WebhookModule } from './modules/webhook/webhook.module'
+import {
+  BookingModule,
+  CustomerModule,
+  NotificationModule,
+  ShopModule,
+  UserModule,
+  VoucherModule,
+  WebhookModule
+} from './modules'
 
 @Module({
   imports: [
@@ -9,7 +16,8 @@ import { WebhookModule } from './modules/webhook/webhook.module'
     CustomerModule,
     VoucherModule,
     BookingModule,
-    WebhookModule
+    WebhookModule,
+    NotificationModule
   ],
   providers: []
 })

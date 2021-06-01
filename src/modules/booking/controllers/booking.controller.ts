@@ -10,6 +10,7 @@ import { CheckoutDto, DroppedDto } from '../dtos'
 import { Pagination } from 'nestjs-typeorm-paginate'
 import { BookingModel } from '@my-guardian-api/database'
 import { GetBookingByIdQuery, GetBookingQuery } from '../queries/query'
+import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase'
 
 @ApiTags('bookings')
 @Controller('/bookings')
@@ -17,7 +18,9 @@ import { GetBookingByIdQuery, GetBookingQuery } from '../queries/query'
 @UseGuards(AuthGuard(['jwt']), RolesGuard)
 export class BookingController {
   constructor(private readonly commandBus: CommandBus,
-              private readonly queryBus: QueryBus) {
+              private readonly queryBus: QueryBus,
+              @InjectFirebaseAdmin()
+              private readonly firebase: FirebaseAdmin) {
   }
 
   @Post('/checkout')

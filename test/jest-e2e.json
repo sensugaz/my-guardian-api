@@ -20,6 +20,8 @@
     "@my-guardian-api/authenticate/(.*)": "<rootDir>/../libs/authenticate/src/$1",
     "@my-guardian-api/authenticate": "<rootDir>/../libs/authenticate/src",
     "@my-guardian-api/google-map/(.*)": "<rootDir>/../libs/google-map/src/$1",
-    "@my-guardian-api/google-map": "<rootDir>/../libs/google-map/src"
+    "@my-guardian-api/google-map": "<rootDir>/../libs/google-map/src",
+    "@app/firebase/(.*)": "<rootDir>/../libs/firebase/src/$1",
+    "@app/firebase": "<rootDir>/../libs/firebase/src"
   }
 }

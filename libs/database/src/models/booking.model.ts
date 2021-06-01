@@ -87,6 +87,12 @@ export class BookingModel extends BaseModel {
   })
   bookingBagStatus: BookingBagStatusEnum
 
+  @Column({
+    name: 'notification_time',
+    nullable: true
+  })
+  notificationTime: string
+
   @OneToMany(() => BookingBagModel, (x) => x.booking, {
     cascade: true,
     eager: true
@@ -107,6 +113,8 @@ export class BookingModel extends BaseModel {
     }
 
     this.bags.push(bag)
+
+    this.bookingBagStatus = BookingBagStatusEnum.DROPPED
   }
 
   withdraw() {
@@ -115,5 +123,9 @@ export class BookingModel extends BaseModel {
     }
 
     this.bookingBagStatus = BookingBagStatusEnum.WITHDRAW
+  }
+
+  setNotificationTime(time: string) {
+    this.notificationTime = time
   }
 }

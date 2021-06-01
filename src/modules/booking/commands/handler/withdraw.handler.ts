@@ -3,7 +3,7 @@ import { WithdrawCommand } from '../command'
 import { BookingModel } from '@my-guardian-api/database'
 import { InjectRepository } from '@nestjs/typeorm'
 import { BookingBagRepository, BookingRepository, CustomerRepository } from '@my-guardian-api/database/repositories'
-import { ApiException } from '@my-guardian-api/common'
+import { ApiException, BookingBagStatusEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 
 @CommandHandler(WithdrawCommand)
@@ -31,6 +31,15 @@ export class WithdrawHandler implements ICommandHandler<WithdrawCommand> {
         type: 'application',
         module: 'booking',
         codes: ['booking_not_found'],
+        statusCode: HttpStatus.BAD_REQUEST
+      })
+    }
+
+    if (booking.bookingBagStatus != BookingBagStatusEnum.DROPPED) {
+      throw new ApiException({
+        type: 'application',
+        module: 'booking',
+        codes: ['booking_not_dropped'],
         statusCode: HttpStatus.BAD_REQUEST
       })
     }

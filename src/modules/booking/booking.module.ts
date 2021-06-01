@@ -17,6 +17,7 @@ import { StripeModule } from 'nestjs-stripe'
 import { ConfigService } from '@nestjs/config'
 import { CommandHandlers } from './commands'
 import { QueryHandlers } from './queries'
+import { FirebaseModule } from 'nestjs-firebase'
 
 @Module({
   imports: [
@@ -32,6 +33,9 @@ import { QueryHandlers } from './queries'
       ShopRepository,
       BookingBagRepository
     ]),
+    FirebaseModule.forRoot({
+      googleApplicationCredential: `${process.cwd()}/firebase.spec.json`
+    }),
     StripeModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

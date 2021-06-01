@@ -41,6 +41,12 @@
       ],
       "@my-guardian-api/google-map/*": [
         "libs/google-map/src/*"
+      ],
+      "@app/firebase": [
+        "libs/firebase/src"
+      ],
+      "@app/firebase/*": [
+        "libs/firebase/src/*"
       ]
     }
   }

@@ -59,7 +59,7 @@ export class DroppedHandler implements ICommandHandler<DroppedCommand> {
         droppedAt: new Date()
       }))
     }
-
+    
     return await this.bookingRepository.save(booking)
   }
 }

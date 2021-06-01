@@ -23,16 +23,17 @@ export class GetBookingByIdHandler implements IQueryHandler<GetBookingByIdQuery>
       .leftJoinAndSelect('booking.customer', 'customer')
       .leftJoinAndSelect('booking.shop', 'shop')
       .leftJoinAndSelect('booking.bags', 'bags')
+      .where('booking.id = :id', { id: query.bookingId })
       .withDeleted()
 
     switch (query.user.role.key) {
       case 'CUSTOMER':
         const customer = await this.customerRepository.findOne({ userId: query.user.id })
-        queryBuilder = queryBuilder.where('booking.customer.id = :customerId', { customerId: customer.id })
+        queryBuilder = queryBuilder.andWhere('booking.customer.id = :customerId', { customerId: customer.id })
         break
       case 'SHOP':
         const shop = await this.customerRepository.findOne({ userId: query.user.id })
-        queryBuilder = queryBuilder.where('booking.shop.id = :shopId', { shopId: shop.id })
+        queryBuilder = queryBuilder.andWhere('booking.shop.id = :shopId', { shopId: shop.id })
         break
     }
 

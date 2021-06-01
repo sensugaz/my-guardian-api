@@ -13,18 +13,15 @@ export class BookingBagModel extends BaseModel {
   @Column()
   number: string
 
-  // @Column('varchar')
-  // status: BookingBagStatusEnum
-
   @Column({
-    type: 'timestamp',
+    type: 'timestamp without time zone',
     name: 'dropped_at',
     nullable: true
   })
   droppedAt: Date
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamp without time zone',
     name: 'withdraw_at',
     nullable: true
   })
