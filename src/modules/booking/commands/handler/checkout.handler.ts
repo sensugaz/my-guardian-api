@@ -11,6 +11,7 @@ import {
   VoucherRepository
 } from '@my-guardian-api/database/repositories'
 import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
+import { BookingModel } from '@my-guardian-api/database'
 
 @CommandHandler(CheckoutCommand)
 export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
@@ -35,10 +36,8 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
     paymentIntent: string
     ephemeralKey: string
     customer: string
-    bookingId: string
+    booking: BookingModel
   }> {
-    console.log('booking => ', body)
-
     let customer = await this.customerRepository.findOne({
       userId: user.id
     })
@@ -160,25 +159,14 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         metadata: {
           bookingId: booking.id
         }
-        // use_stripe_sdk: true,
-        // confirmation_method: 'manual'
       }
-      // {
-      //   stripeAccount: 'acct_1IVlMiCifXg5OoAD'
-      // }
     )
-
-    console.log({
-      paymentIntent: paymentIntent.client_secret,
-      ephemeralKey: ephemeralKey.secret,
-      customer: customer.stripeCustomerId
-    })
 
     return {
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
       customer: customer.stripeCustomerId,
-      bookingId: booking.id
+      booking: booking
     }
   }
 }
