@@ -18,10 +18,11 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
 
   async execute(query: GetBookingQuery): Promise<Pagination<BookingModel>> {
     const tableName = 'bookings'
+
     let queryBuilder: any = this.bookingRepository
       .createQueryBuilder(tableName)
-      .leftJoinAndSelect('bookings.customer', 'customer')
-      .leftJoinAndSelect('bookings.shop', 'shop')
+      .leftJoinAndSelect(`${tableName}.customer`, 'customer')
+      .leftJoinAndSelect(`${tableName}.shop`, 'shop')
       .withDeleted()
 
     queryBuilder = await parserToTypeOrmQueryBuilder(
@@ -35,11 +36,11 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
     switch (query.user.role.key) {
       case 'CUSTOMER':
         const customer = await this.customerRepository.findOne({ userId: query.user.id })
-        queryBuilder = queryBuilder.where('bookings.customer.id = :customerId', { customerId: customer.id })
+        queryBuilder.andWhere(`${tableName}.customer.id = :customerId`, { customerId: customer.id })
         break
       case 'SHOP':
         const shop = await this.shopRepository.findOne({ userId: query.user.id })
-        queryBuilder = queryBuilder.where('bookings.shop.id = :shopId', { shopId: shop.id })
+        queryBuilder.andWhere(`${tableName}.shop_id = :shopId`, { shopId: shop.id })
         break
     }
 
