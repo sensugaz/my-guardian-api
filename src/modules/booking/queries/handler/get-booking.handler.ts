@@ -24,6 +24,14 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
       .leftJoinAndSelect('bookings.shop', 'shop')
       .withDeleted()
 
+    queryBuilder = await parserToTypeOrmQueryBuilder(
+      tableName,
+      query.query,
+      queryBuilder,
+      query.sort,
+      query.orderBy
+    )
+
     switch (query.user.role.key) {
       case 'CUSTOMER':
         const customer = await this.customerRepository.findOne({ userId: query.user.id })
@@ -35,13 +43,6 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
         break
     }
 
-    queryBuilder = await parserToTypeOrmQueryBuilder(
-      tableName,
-      query.query,
-      queryBuilder,
-      query.sort,
-      query.orderBy
-    )
     return await paginate(queryBuilder, query.options)
   }
 
