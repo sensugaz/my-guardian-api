@@ -30,61 +30,65 @@ export class NotificationService {
       relations: ['customer']
     })
 
+    const day = moment().format('dddd')
+
     for (const booking of bookings) {
-      const start = moment()
-      const end = moment(booking.scheduleCloseTime, 'HH.mm')
-      const duration = moment.duration(end.diff(start))
-      const minute = duration.asMinutes()
-      const user = await this.userRepository.findOne({
-        id: booking?.customer?.userId
-      })
+      if (booking.scheduleDay === day.toUpperCase()) {
+        const start = moment()
+        const end = moment(booking.scheduleCloseTime, 'HH.mm')
+        const duration = moment.duration(end.diff(start))
+        const minute = duration.asMinutes()
+        const user = await this.userRepository.findOne({
+          id: booking?.customer?.userId
+        })
 
-      if (user.deviceId) {
-        if (Math.floor(minute) === 5 && booking.notificationTime === '30') {
-          Logger.debug('5')
-          booking.setNotificationTime('5')
-          await this.bookingRepository.save(booking)
+        if (user.deviceId) {
+          if (Math.floor(minute) === 5 && booking.notificationTime === '30') {
+            Logger.debug('5')
+            booking.setNotificationTime('5')
+            await this.bookingRepository.save(booking)
 
-          await this.fmc.send({
-            to: user.deviceId,
-            data: {
-              bookingId: booking.id
-            },
-            notification: {
-              title: 'Retrait MyGuardian',
-              body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.'
-            }
-          })
-        } else if (Math.floor(minute) === 30 && booking.notificationTime === '60') {
-          Logger.debug('30')
-          booking.setNotificationTime('30')
-          await this.bookingRepository.save(booking)
+            await this.fmc.send({
+              to: user.deviceId,
+              data: {
+                bookingId: booking.id
+              },
+              notification: {
+                title: 'Retrait MyGuardian',
+                body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.'
+              }
+            })
+          } else if (Math.floor(minute) === 30 && booking.notificationTime === '60') {
+            Logger.debug('30')
+            booking.setNotificationTime('30')
+            await this.bookingRepository.save(booking)
 
-          await this.fmc.send({
-            to: user.deviceId,
-            data: {
-              bookingId: booking.id
-            },
-            notification: {
-              title: 'Retrait MyGuardian',
-              body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.'
-            }
-          })
-        } else if (Math.floor(minute) === 60 && !booking.notificationTime) {
-          Logger.debug('60')
-          booking.setNotificationTime('60')
-          await this.bookingRepository.save(booking)
+            await this.fmc.send({
+              to: user.deviceId,
+              data: {
+                bookingId: booking.id
+              },
+              notification: {
+                title: 'Retrait MyGuardian',
+                body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.'
+              }
+            })
+          } else if (Math.floor(minute) === 60 && !booking.notificationTime) {
+            Logger.debug('60')
+            booking.setNotificationTime('60')
+            await this.bookingRepository.save(booking)
 
-          await this.fmc.send({
-            to: user.deviceId,
-            data: {
-              bookingId: booking.id
-            },
-            notification: {
-              title: 'Retrait MyGuardian',
-              body: 'Votre commerçant ferme dans moins d\'une heure. Pensez à retirer vos équipements.'
-            }
-          })
+            await this.fmc.send({
+              to: user.deviceId,
+              data: {
+                bookingId: booking.id
+              },
+              notification: {
+                title: 'Retrait MyGuardian',
+                body: 'Votre commerçant ferme dans moins d\'une heure. Pensez à retirer vos équipements.'
+              }
+            })
+          }
         }
       }
     }
