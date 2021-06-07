@@ -12,7 +12,7 @@ export class CreateVoucherHandler
 
   async execute({ body }: CreateVoucherCommand): Promise<VoucherModel> {
     const voucherModel = this.entityManager.create(VoucherModel, {
-      code: body.code.toLocaleUpperCase(),
+      code: body.code.toUpperCase(),
       name: body.name,
       description: body.description,
       percent: body.percent,
