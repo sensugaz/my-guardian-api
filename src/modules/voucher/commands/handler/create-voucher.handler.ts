@@ -19,7 +19,7 @@ export class CreateVoucherHandler
     })
 
     const codeExists = await this.entityManager.findOne(VoucherModel, {
-      code: body.code,
+      code: body.code.toUpperCase(),
     })
 
     if (codeExists) {
