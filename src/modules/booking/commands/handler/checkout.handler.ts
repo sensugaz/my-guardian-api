@@ -146,7 +146,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
     )
 
     const paymentIntent = await this.stripeClient.paymentIntents.create({
-      amount: Number(totalAmount) * 100,
+      amount: Math.floor(Number(totalAmount) * 100),
       currency: 'eur',
       customer: customer.stripeCustomerId,
       metadata: {
