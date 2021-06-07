@@ -83,15 +83,6 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       })
     }
 
-    if (schedule.isClose) {
-      throw new ApiException({
-        type: 'application',
-        module: 'booking',
-        codes: ['schedule_is_closed'],
-        statusCode: HttpStatus.BAD_REQUEST,
-      })
-    }
-
     const price = shop.prices.find((i) => i.id === body.priceId)
 
     if (!price) {
@@ -103,7 +94,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       })
     }
 
-    const amount = price.price
+    const amount = Number(price.price)
     let discount = 0
 
     if (body.voucherCode) {
@@ -120,10 +111,10 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         })
       }
 
-      discount = Number(amount) * (Number(voucher.percent) / 100)
+      discount = amount * (Number(voucher.percent) / 100)
     }
 
-    const totalAmount = Number(amount) - discount
+    const totalAmount = amount - discount
 
     const booking = await this.bookingRepository.save(
       this.bookingRepository.create({
@@ -137,7 +128,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
         amount: amount,
         qty: price.qty,
         discount: discount,
-        totalAmount: totalAmount,
+        totalAmount: Number(totalAmount),
         paymentStatus: PaymentStatusEnum.PENDING,
         bookingStatus: BookingStatusEnum.PENDING,
       }),
@@ -155,7 +146,7 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
     )
 
     const paymentIntent = await this.stripeClient.paymentIntents.create({
-      amount: totalAmount * 100,
+      amount: Number(totalAmount) * 100,
       currency: 'eur',
       customer: customer.stripeCustomerId,
       metadata: {
