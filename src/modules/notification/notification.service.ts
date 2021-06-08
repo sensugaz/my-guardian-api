@@ -33,7 +33,7 @@ export class NotificationService {
     const day = moment().format('dddd')
 
     for (const booking of bookings) {
-      if (booking.scheduleDay === day.toUpperCase()) {
+      if (booking.scheduleDay === day.toUpperCase() && booking.scheduleOpenTime !== null && booking.scheduleCloseTime !== null) {
         const start = moment()
         const end = moment(booking.scheduleCloseTime, 'HH.mm')
         const duration = moment.duration(end.diff(start))

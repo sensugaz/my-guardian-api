@@ -31,12 +31,14 @@ export class BookingModel extends BaseModel {
   scheduleDay: string
 
   @Column({
-    name: 'schedule_open_time'
+    name: 'schedule_open_time',
+    nullable: true
   })
   scheduleOpenTime: string
 
   @Column({
-    name: 'schedule_close_time'
+    name: 'schedule_close_time',
+    nullable: true
   })
   scheduleCloseTime: string
 
