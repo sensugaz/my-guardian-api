@@ -2,43 +2,47 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { ShopModel } from '@my-guardian-api/database/models/shop.model'
 import { CustomerModel } from '@my-guardian-api/database/models/customer.model'
-import { BookingBagStatusEnum, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
+import {
+  BookingBagStatusEnum,
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from '@my-guardian-api/common'
 import { BookingBagModel } from '@my-guardian-api/database/models/booking-bag.model'
 
 @Entity('bookings')
 export class BookingModel extends BaseModel {
   @ManyToOne(() => ShopModel, (x) => x.bookings)
   @JoinColumn({
-    name: 'shop_id'
+    name: 'shop_id',
   })
   shop: ShopModel
 
-  @ManyToOne(() => CustomerModel, (x) => x.bookings)
+  @ManyToOne(() => CustomerModel, (x) => x.bookings, { onDelete: 'CASCADE' })
   @JoinColumn({
-    name: 'customer_id'
+    name: 'customer_id',
   })
   customer: CustomerModel
 
   @Column({
     name: 'voucher_code',
-    nullable: true
+    nullable: true,
   })
   voucherCode: string
 
   @Column({
-    name: 'schedule_day'
+    name: 'schedule_day',
   })
   scheduleDay: string
 
   @Column({
     name: 'schedule_open_time',
-    nullable: true
+    nullable: true,
   })
   scheduleOpenTime: string
 
   @Column({
     name: 'schedule_close_time',
-    nullable: true
+    nullable: true,
   })
   scheduleCloseTime: string
 
@@ -51,14 +55,14 @@ export class BookingModel extends BaseModel {
   @Column({
     type: 'decimal',
     precision: 6,
-    scale: 2
+    scale: 2,
   })
   amount: number
 
   @Column({
     type: 'decimal',
     precision: 6,
-    scale: 2
+    scale: 2,
   })
   discount: number
 
@@ -66,38 +70,38 @@ export class BookingModel extends BaseModel {
     type: 'decimal',
     precision: 6,
     scale: 2,
-    name: 'total_amount'
+    name: 'total_amount',
   })
   totalAmount: number
 
   @Column({
     type: 'varchar',
-    name: 'payment_status'
+    name: 'payment_status',
   })
   paymentStatus: PaymentStatusEnum
 
   @Column({
     type: 'varchar',
-    name: 'booking_status'
+    name: 'booking_status',
   })
   bookingStatus: BookingStatusEnum
 
   @Column({
     type: 'varchar',
     name: 'booking_bag_status',
-    nullable: true
+    nullable: true,
   })
   bookingBagStatus: BookingBagStatusEnum
 
   @Column({
     name: 'notification_time',
-    nullable: true
+    nullable: true,
   })
   notificationTime: string
 
   @OneToMany(() => BookingBagModel, (x) => x.booking, {
     cascade: true,
-    eager: true
+    eager: true,
   })
   bags: BookingBagModel[]
 
