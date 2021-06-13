@@ -21,9 +21,9 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
 
     let queryBuilder: any = this.bookingRepository
       .createQueryBuilder(tableName)
+      .withDeleted()
       .leftJoinAndSelect(`${tableName}.customer`, 'customer')
       .leftJoinAndSelect(`${tableName}.shop`, 'shop')
-      .withDeleted()
 
     queryBuilder = await parserToTypeOrmQueryBuilder(
       tableName,
