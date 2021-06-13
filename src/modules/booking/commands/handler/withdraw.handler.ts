@@ -31,6 +31,8 @@ export class WithdrawHandler implements ICommandHandler<WithdrawCommand> {
     const booking = await this.bookingRepository.findOne({
       id: bookingId,
       customer: customer
+    }, {
+      relations: ['shop']
     })
 
     if (!booking) {
