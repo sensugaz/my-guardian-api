@@ -29,7 +29,7 @@ export class UserTokenModel extends BaseModel {
   used: boolean
 
   @ApiHideProperty()
-  @ManyToOne(() => UserModel, (x) => x.tokens)
+  @ManyToOne(() => UserModel, (x) => x.tokens, { onDelete: 'CASCADE' })
   @JoinColumn({
     name: 'user_id',
   })

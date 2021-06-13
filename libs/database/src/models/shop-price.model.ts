@@ -17,7 +17,7 @@ export class ShopPriceModel extends BaseModel {
   @Column()
   qty: number
 
-  @ManyToOne(() => ShopModel, (x) => x.schedules)
+  @ManyToOne(() => ShopModel, (x) => x.schedules, { onDelete: 'CASCADE' })
   @JoinColumn({
     name: 'shop_id',
   })

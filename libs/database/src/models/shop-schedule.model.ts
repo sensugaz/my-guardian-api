@@ -24,7 +24,7 @@ export class ShopScheduleModel extends BaseModel {
   })
   isClose: boolean
 
-  @ManyToOne(() => ShopModel, (x) => x.schedules)
+  @ManyToOne(() => ShopModel, (x) => x.schedules, { onDelete: 'CASCADE' })
   @JoinColumn({
     name: 'shop_id',
   })

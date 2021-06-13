@@ -11,7 +11,7 @@ import { BookingBagModel } from '@my-guardian-api/database/models/booking-bag.mo
 
 @Entity('bookings')
 export class BookingModel extends BaseModel {
-  @ManyToOne(() => ShopModel, (x) => x.bookings)
+  @ManyToOne(() => ShopModel, (x) => x.bookings, { onDelete: 'CASCADE' })
   @JoinColumn({
     name: 'shop_id',
   })
