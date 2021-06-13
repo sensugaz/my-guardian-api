@@ -100,4 +100,8 @@ export class ShopModel extends BaseModel {
   decAvailable(num: number) {
     this.available -= Number(num)
   }
+
+  incAvailable(num: number) {
+    this.available += Number(num)
+  }
 }

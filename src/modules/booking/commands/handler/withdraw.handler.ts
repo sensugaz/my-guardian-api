@@ -2,7 +2,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { WithdrawCommand } from '../command'
 import { BookingModel } from '@my-guardian-api/database'
 import { InjectRepository } from '@nestjs/typeorm'
-import { BookingBagRepository, BookingRepository, CustomerRepository } from '@my-guardian-api/database/repositories'
+import {
+  BookingBagRepository,
+  BookingRepository,
+  CustomerRepository,
+  ShopRepository
+} from '@my-guardian-api/database/repositories'
 import { ApiException, BookingBagStatusEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 
@@ -13,7 +18,9 @@ export class WithdrawHandler implements ICommandHandler<WithdrawCommand> {
               @InjectRepository(BookingBagRepository)
               private readonly bookingBagRepository: BookingBagRepository,
               @InjectRepository(CustomerRepository)
-              private readonly customerRepository: CustomerRepository) {
+              private readonly customerRepository: CustomerRepository,
+              @InjectRepository(ShopRepository)
+              private readonly shopRepository: ShopRepository) {
   }
 
   async execute({ user, bookingId }: WithdrawCommand): Promise<BookingModel> {
@@ -45,6 +52,14 @@ export class WithdrawHandler implements ICommandHandler<WithdrawCommand> {
     }
 
     booking.withdraw()
+
+    const shop = await this.shopRepository.findOneWithDelete(booking.shop?.id)
+
+    if (shop) {
+      shop.incAvailable(booking.qty)
+    }
+
+    await this.shopRepository.save(shop)
 
     return await this.bookingRepository.save(booking)
   }
