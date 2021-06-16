@@ -20,11 +20,11 @@ export class GetBookingByIdHandler implements IQueryHandler<GetBookingByIdQuery>
     const tableName = 'booking'
     let queryBuilder: any = this.bookingRepository
       .createQueryBuilder(tableName)
+      .withDeleted()
       .leftJoinAndSelect('booking.customer', 'customer')
       .leftJoinAndSelect('booking.shop', 'shop')
       .leftJoinAndSelect('booking.bags', 'bags')
       .where('booking.id = :id', { id: query.bookingId })
-      .withDeleted()
 
     switch (query.user.role.key) {
       case 'CUSTOMER':
