@@ -4,7 +4,12 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { CommonModule } from '@my-guardian-api/common'
 import { DatabaseModule } from '@my-guardian-api/database'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { BookingRepository, CustomerRepository, UserRepository } from '@my-guardian-api/database/repositories'
+import {
+  BookingRepository,
+  CustomerRepository,
+  ShopScheduleRepository,
+  UserRepository,
+} from '@my-guardian-api/database/repositories'
 import { NotificationController } from './notification.controller'
 
 @Module({
@@ -15,12 +20,11 @@ import { NotificationController } from './notification.controller'
     TypeOrmModule.forFeature([
       UserRepository,
       CustomerRepository,
-      BookingRepository
-    ])
+      BookingRepository,
+      ShopScheduleRepository,
+    ]),
   ],
   controllers: [NotificationController],
-  providers: [NotificationService]
+  providers: [NotificationService],
 })
-export class NotificationModule {
-
-}
+export class NotificationModule {}

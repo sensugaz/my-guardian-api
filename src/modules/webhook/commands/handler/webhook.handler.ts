@@ -4,40 +4,48 @@ import {
   BookingRepository,
   ShopRepository,
   UserRepository,
-  VoucherHistoryRepository
+  VoucherHistoryRepository,
 } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
-import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
+import {
+  ApiException,
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 import { BookingModel } from '@my-guardian-api/database'
 import { MailerService } from '@my-guardian-api/mailer'
 
 @CommandHandler(WebhookCommand)
 export class WebhookHandler implements ICommandHandler<WebhookCommand> {
-  constructor(@InjectRepository(BookingRepository)
-              private readonly bookingRepository: BookingRepository,
-              @InjectRepository(ShopRepository)
-              private readonly shopRepository: ShopRepository,
-              @InjectRepository(VoucherHistoryRepository)
-              private readonly voucherHistoryRepository: VoucherHistoryRepository,
-              @InjectRepository(UserRepository)
-              private readonly userRepository: UserRepository,
-              private readonly mailerService: MailerService) {
-  }
+  constructor(
+    @InjectRepository(BookingRepository)
+    private readonly bookingRepository: BookingRepository,
+    @InjectRepository(ShopRepository)
+    private readonly shopRepository: ShopRepository,
+    @InjectRepository(VoucherHistoryRepository)
+    private readonly voucherHistoryRepository: VoucherHistoryRepository,
+    @InjectRepository(UserRepository)
+    private readonly userRepository: UserRepository,
+    private readonly mailerService: MailerService,
+  ) {}
 
   async execute({ body }: WebhookCommand): Promise<BookingModel> {
-    const booking = await this.bookingRepository.findOne({
-      id: body.data?.object?.metadata?.bookingId
-    }, {
-      relations: ['shop', 'customer']
-    })
+    const booking = await this.bookingRepository.findOne(
+      {
+        id: body.data?.object?.metadata?.bookingId,
+      },
+      {
+        relations: ['shop', 'customer'],
+      },
+    )
 
     if (!booking) {
       throw new ApiException({
         type: 'application',
         module: 'user',
         codes: ['booking_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
@@ -51,20 +59,40 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         await this.shopRepository.save(booking.shop)
 
         if (booking.voucherCode) {
-          await this.voucherHistoryRepository.save(this.voucherHistoryRepository.create({
-            user: {
-              id: booking.customer.userId
-            },
-            code: booking.voucherCode
-          }))
+          await this.voucherHistoryRepository.save(
+            this.voucherHistoryRepository.create({
+              user: {
+                id: booking.customer.userId,
+              },
+              code: booking.voucherCode,
+            }),
+          )
         }
 
-        const user = await this.userRepository.findOne({ id: booking.shop.userId })
+        const user = await this.userRepository.findOne({
+          id: booking.shop.userId,
+        })
 
         if (booking.qty == 1) {
-          await this.mailerService.sendWithTemplate(user.email, 'New order solo offer', {}, 'solo-booking')
+          await this.mailerService.sendWithTemplate(
+            user.email,
+            'New order solo offer',
+            {
+              url: `https://moto-back-office.vercel.app/order/${booking.id}/detail`,
+              bookingId: booking.id,
+            },
+            'solo-booking',
+          )
         } else {
-          await this.mailerService.sendWithTemplate(user.email, 'New order duo offer', {}, 'duo-booking')
+          await this.mailerService.sendWithTemplate(
+            user.email,
+            'New order duo offer',
+            {
+              url: `https://moto-back-office.vercel.app/order/${booking.id}/detail`,
+              bookingId: booking.id,
+            },
+            'duo-booking',
+          )
         }
         break
       case 'payment_intent.processing':

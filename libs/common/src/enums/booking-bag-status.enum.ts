@@ -1,4 +1,4 @@
 export enum BookingBagStatusEnum {
   DROPPED = 'DROPPED',
-  WITHDRAW = 'WITHDRAW'
+  WITHDRAW = 'WITHDRAW',
 }

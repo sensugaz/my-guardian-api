@@ -3,91 +3,129 @@ import * as FCM from 'fcm-push'
 import { ConfigService } from '@nestjs/config'
 import { Cron } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
-import { BookingRepository, UserRepository } from '@my-guardian-api/database/repositories'
-import { BookingBagStatusEnum } from '@my-guardian-api/common'
+import {
+  BookingRepository,
+  ShopScheduleRepository,
+  UserRepository,
+} from '@my-guardian-api/database/repositories'
+import {
+  BookingBagStatusEnum,
+  BookingStatusEnum,
+} from '@my-guardian-api/common'
 import * as moment from 'moment-timezone'
-import { Not } from 'typeorm'
+import { Brackets, IsNull, Not } from 'typeorm'
 
 @Injectable()
 export class NotificationService {
   fmc: FCM
 
-  constructor(private readonly configService: ConfigService,
-              @InjectRepository(UserRepository)
-              private readonly userRepository: UserRepository,
-              @InjectRepository(BookingRepository)
-              private readonly bookingRepository: BookingRepository) {
+  constructor(
+    private readonly configService: ConfigService,
+    @InjectRepository(UserRepository)
+    private readonly userRepository: UserRepository,
+    @InjectRepository(BookingRepository)
+    private readonly bookingRepository: BookingRepository,
+    @InjectRepository(ShopScheduleRepository)
+    private readonly shopScheduleRepository: ShopScheduleRepository,
+  ) {
     this.fmc = new FCM(this.configService.get<string>('SERVER_KEY'))
+    moment.tz.setDefault('Europe/Paris')
   }
 
   @Cron('60 * * * * *')
   async handleCron() {
-    const bookings = await this.bookingRepository.find({
-      where: {
-        bookingBagStatus: BookingBagStatusEnum.DROPPED,
-        notificationTime: Not(5)
-      },
-      relations: ['customer']
-    })
+    const bookings = await this.bookingRepository
+      .createQueryBuilder('bookings')
+      .innerJoinAndSelect('bookings.customer', 'customer')
+      .innerJoinAndSelect('bookings.shop', 'shop')
+      .where('bookings.booking_status = :bookingStatus', {
+        bookingStatus: BookingStatusEnum.COMPLETED,
+      })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('bookings.booking_bag_status = :bookingBagStatus', {
+            bookingBagStatus: BookingBagStatusEnum.DROPPED,
+          }).orWhere('bookings.booking_bag_status is null')
+        }),
+      )
+      .getMany()
 
     const day = moment().format('dddd')
 
     for (const booking of bookings) {
-      if (booking.scheduleDay === day.toUpperCase() && booking.scheduleOpenTime !== null && booking.scheduleCloseTime !== null) {
-        const start = moment()
-        const end = moment(booking.scheduleCloseTime, 'HH.mm')
-        const duration = moment.duration(end.diff(start))
-        const minute = duration.asMinutes()
-        const user = await this.userRepository.findOne({
-          id: booking?.customer?.userId
+      if (booking.scheduleDay === day.toUpperCase()) {
+        const shopSchedule = await this.shopScheduleRepository.findOne({
+          where: {
+            day: booking.scheduleDay,
+            shop: {
+              id: booking.shop.id,
+            },
+          },
         })
 
-        if (user.deviceId) {
-          if (Math.floor(minute) === 5 && booking.notificationTime === '30') {
-            Logger.debug('5')
-            booking.setNotificationTime('5')
-            await this.bookingRepository.save(booking)
+        if (!shopSchedule.isClose) {
+          const start = moment()
+          const [scheduleCloseHour, scheduleCloseMinute] =
+            shopSchedule.closeTime.split(':')
+          const end = moment()
+            .hour(Number(scheduleCloseHour))
+            .minute(Number(scheduleCloseMinute))
+          const duration = moment.duration(end.diff(start))
+          const minute = duration.asMinutes()
 
-            await this.fmc.send({
-              to: user.deviceId,
-              data: {
-                bookingId: booking.id
-              },
-              notification: {
-                title: 'Retrait MyGuardian',
-                body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.'
-              }
+          if (minute > 0) {
+            const user = await this.userRepository.findOne({
+              id: booking?.customer?.userId,
             })
-          } else if (Math.floor(minute) === 30 && booking.notificationTime === '60') {
-            Logger.debug('30')
-            booking.setNotificationTime('30')
-            await this.bookingRepository.save(booking)
 
-            await this.fmc.send({
-              to: user.deviceId,
-              data: {
-                bookingId: booking.id
-              },
-              notification: {
-                title: 'Retrait MyGuardian',
-                body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.'
-              }
-            })
-          } else if (Math.floor(minute) === 60 && !booking.notificationTime) {
-            Logger.debug('60')
-            booking.setNotificationTime('60')
-            await this.bookingRepository.save(booking)
+            if (user && user.deviceId) {
+              if (Math.floor(minute) === 5) {
+                booking.setNotificationTime(start.format())
+                await this.bookingRepository.save(booking)
 
-            await this.fmc.send({
-              to: user.deviceId,
-              data: {
-                bookingId: booking.id
-              },
-              notification: {
-                title: 'Retrait MyGuardian',
-                body: 'Votre commerçant ferme dans moins d\'une heure. Pensez à retirer vos équipements.'
+                await this.fmc.send({
+                  to: user.deviceId,
+                  data: {
+                    bookingId: booking.id,
+                  },
+                  notification: {
+                    title: 'Retrait MyGuardian',
+                    body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.',
+                  },
+                })
+                Logger.debug('Fire Noti: 5')
+              } else if (Math.floor(minute) === 30) {
+                booking.setNotificationTime(start.format())
+                await this.bookingRepository.save(booking)
+
+                await this.fmc.send({
+                  to: user.deviceId,
+                  data: {
+                    bookingId: booking.id,
+                  },
+                  notification: {
+                    title: 'Retrait MyGuardian',
+                    body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.',
+                  },
+                })
+                Logger.debug('Fire Noti: 30')
+              } else if (Math.floor(minute) === 60) {
+                booking.setNotificationTime(start.format())
+                await this.bookingRepository.save(booking)
+
+                await this.fmc.send({
+                  to: user.deviceId,
+                  data: {
+                    bookingId: booking.id,
+                  },
+                  notification: {
+                    title: 'Retrait MyGuardian',
+                    body: "Votre commerçant ferme dans moins d'une heure. Pensez à retirer vos équipements.",
+                  },
+                })
+                Logger.debug('Fire Noti: 60')
               }
-            })
+            }
           }
         }
       }
