@@ -45,7 +45,7 @@ export class NotificationService {
         new Brackets((qb) => {
           qb.where('bookings.booking_bag_status = :bookingBagStatus', {
             bookingBagStatus: BookingBagStatusEnum.DROPPED,
-          }).orWhere('bookings.booking_bag_status is null')
+          })
         }),
       )
       .getMany()
