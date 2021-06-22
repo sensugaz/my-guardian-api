@@ -4,17 +4,14 @@ import {
   BookingRepository,
   ShopRepository,
   UserRepository,
-  VoucherHistoryRepository,
+  VoucherHistoryRepository
 } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
-import {
-  ApiException,
-  BookingStatusEnum,
-  PaymentStatusEnum,
-} from '@my-guardian-api/common'
+import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 import { BookingModel } from '@my-guardian-api/database'
 import { MailerService } from '@my-guardian-api/mailer'
+import { ConfigService } from '@nestjs/config'
 
 @CommandHandler(WebhookCommand)
 export class WebhookHandler implements ICommandHandler<WebhookCommand> {
@@ -28,16 +25,18 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
     private readonly mailerService: MailerService,
-  ) {}
+    private readonly configService: ConfigService
+  ) {
+  }
 
   async execute({ body }: WebhookCommand): Promise<BookingModel> {
     const booking = await this.bookingRepository.findOne(
       {
-        id: body.data?.object?.metadata?.bookingId,
+        id: body.data?.object?.metadata?.bookingId
       },
       {
-        relations: ['shop', 'customer'],
-      },
+        relations: ['shop', 'customer']
+      }
     )
 
     if (!booking) {
@@ -45,7 +44,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         type: 'application',
         module: 'user',
         codes: ['booking_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
@@ -62,15 +61,15 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
           await this.voucherHistoryRepository.save(
             this.voucherHistoryRepository.create({
               user: {
-                id: booking.customer.userId,
+                id: booking.customer.userId
               },
-              code: booking.voucherCode,
-            }),
+              code: booking.voucherCode
+            })
           )
         }
 
         const user = await this.userRepository.findOne({
-          id: booking.shop.userId,
+          id: booking.shop.userId
         })
 
         if (booking.qty == 1) {
@@ -78,20 +77,20 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
             user.email,
             'New order solo offer',
             {
-              url: `https://moto-back-office.vercel.app/order/${booking.id}/detail`,
-              bookingId: booking.id,
+              url: `${this.configService.get('BACKOFFICE_URL')}/order/${booking.id}/detail`,
+              bookingId: booking.id
             },
-            'solo-booking',
+            'solo-booking'
           )
         } else {
           await this.mailerService.sendWithTemplate(
             user.email,
             'New order duo offer',
             {
-              url: `https://moto-back-office.vercel.app/order/${booking.id}/detail`,
-              bookingId: booking.id,
+              url: `${this.configService.get('BACKOFFICE_URL')}/order/${booking.id}/detail`,
+              bookingId: booking.id
             },
-            'duo-booking',
+            'duo-booking'
           )
         }
         break
