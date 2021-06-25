@@ -1,14 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { RegisterCommand } from '../command'
-import {
-  CustomerModel,
-  RoleModel,
-  UserModel,
-  UserTokenModel,
-} from '@my-guardian-api/database'
+import { CustomerModel, RoleModel, UserModel, UserTokenModel } from '@my-guardian-api/database'
 import { EntityManager } from 'typeorm'
 import { ApiException, RoleEnum, TokenTypeEnum } from '@my-guardian-api/common'
-import { HttpStatus } from '@nestjs/common'
+import { HttpStatus, Logger } from '@nestjs/common'
 import { uid } from 'rand-token'
 import * as bcrypt from 'bcrypt'
 import { ConfigService } from '@nestjs/config'
@@ -19,12 +14,13 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
   constructor(
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
-    private readonly mailerService: MailerService,
-  ) {}
+    private readonly mailerService: MailerService
+  ) {
+  }
 
   async execute({ body }: RegisterCommand): Promise<UserModel> {
     const emailExists = await this.entityManager.findOne(UserModel, {
-      email: body.email,
+      email: body.email
     })
 
     if (emailExists) {
@@ -32,17 +28,17 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
         type: 'application',
         module: 'user',
         codes: ['email_is_exists'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
     const tokenModel = this.entityManager.create(UserTokenModel, {
       token: uid(100),
-      type: TokenTypeEnum.REGISTER,
+      type: TokenTypeEnum.REGISTER
     })
 
     const role = await this.entityManager.findOne(RoleModel, {
-      key: RoleEnum.CUSTOMER,
+      key: RoleEnum.CUSTOMER
     })
 
     if (!role) {
@@ -50,7 +46,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
         type: 'application',
         module: 'user',
         codes: ['role_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
@@ -62,7 +58,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
       password: password,
       salt: salt,
       isActivate: false,
-      role: role,
+      role: role
     })
 
     userModel.addToken(tokenModel)
@@ -74,21 +70,25 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
       firstName: body.firstName,
       lastName: body.lastName,
       phoneCode: body.phoneCode,
-      phoneNumber: body.phoneNumber,
+      phoneNumber: body.phoneNumber
     })
 
     await this.entityManager.save(CustomerModel, customerModel)
 
-    await this.mailerService.sendWithTemplate(
-      user.email,
-      'Confirmation d’inscription',
-      {
-        url: `${this.configService.get<string>(
-          'BASE_URL',
-        )}/users/redirect?type=register&token=${tokenModel.token}`,
-      },
-      'register',
-    )
+    try {
+      await this.mailerService.sendWithTemplate(
+        user.email,
+        'Confirmation d’inscription',
+        {
+          url: `${this.configService.get<string>(
+            'BASE_URL'
+          )}/users/redirect?type=register&token=${tokenModel.token}`
+        },
+        'register'
+      )
+    } catch (e) {
+      Logger.error(e)
+    }
 
     delete user.password
     delete user.salt

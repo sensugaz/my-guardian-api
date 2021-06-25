@@ -5,28 +5,30 @@ import { EntityManager } from 'typeorm'
 import { UserTokenModel } from '@my-guardian-api/database'
 import { ApiException, TokenTypeEnum } from '@my-guardian-api/common'
 import * as bcrypt from 'bcrypt'
+import { Logger } from '@nestjs/common'
 
 @CommandHandler(ResetPasswordCommand)
 export class ResetPasswordHandler
   implements ICommandHandler<ResetPasswordCommand> {
   constructor(
     private readonly entityManager: EntityManager,
-    private readonly mailerService: MailerService,
-  ) {}
+    private readonly mailerService: MailerService
+  ) {
+  }
 
   async execute({ query, body }: ResetPasswordCommand): Promise<any> {
     const token = await this.entityManager.findOne(
       UserTokenModel,
       {
         token: query.token,
-        type: TokenTypeEnum.FORGOT_PASSWORD,
+        type: TokenTypeEnum.FORGOT_PASSWORD
       },
       {
         order: {
-          createdDate: 'ASC',
+          createdDate: 'ASC'
         },
-        relations: ['user'],
-      },
+        relations: ['user']
+      }
     )
 
     if (!token) {
@@ -34,7 +36,7 @@ export class ResetPasswordHandler
         module: 'user',
         type: 'application',
         codes: ['token_not_found'],
-        statusCode: 400,
+        statusCode: 400
       })
     }
 
@@ -43,7 +45,7 @@ export class ResetPasswordHandler
         module: 'user',
         type: 'application',
         codes: ['user_not_found'],
-        statusCode: 400,
+        statusCode: 400
       })
     }
 
@@ -58,12 +60,16 @@ export class ResetPasswordHandler
     await this.entityManager.save(token)
     await this.entityManager.save(token.user)
 
-    await this.mailerService.sendWithTemplate(
-      token.user.email,
-      'Confirmation de changement du mot de passe',
-      {},
-      'reset-password',
-    )
+    try {
+      await this.mailerService.sendWithTemplate(
+        token.user.email,
+        'Confirmation de changement du mot de passe',
+        {},
+        'reset-password'
+      )
+    } catch (e) {
+      Logger.error(e)
+    }
 
     delete token.user.password
     delete token.user.salt

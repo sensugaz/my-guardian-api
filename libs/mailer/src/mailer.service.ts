@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import * as Mail from 'nodemailer/lib/mailer'
 import * as hbs from 'nodemailer-express-handlebars'
 import { ConfigService } from '@nestjs/config'
@@ -23,18 +23,14 @@ export class MailerService {
   }
 
   send(to: string, subject: string, content: string): Promise<SentMessageInfo> {
-    try {
-      const mailOptions = {
-        from: this.configService.get<string>('SMTP_USER'),
-        to,
-        subject,
-        html: content
-      }
-
-      return this.transporter.sendMail(mailOptions)
-    } catch (e) {
-      Logger.error(e)
+    const mailOptions = {
+      from: this.configService.get<string>('SMTP_USER'),
+      to,
+      subject,
+      html: content
     }
+
+    return this.transporter.sendMail(mailOptions)
   }
 
   sendWithTemplate(
@@ -43,32 +39,28 @@ export class MailerService {
     context: any,
     template: string
   ): Promise<SentMessageInfo> {
-    try {
-      this.transporter.use(
-        'compile',
-        hbs({
-          viewEngine: {
-            extName: '.hbs',
-            partialsDir: join(__dirname, 'templates'),
-            layoutsDir: join(__dirname, 'templates'),
-            defaultLayout: ''
-          },
-          viewPath: join(__dirname, 'templates'),
-          extName: '.hbs'
-        })
-      )
+    this.transporter.use(
+      'compile',
+      hbs({
+        viewEngine: {
+          extName: '.hbs',
+          partialsDir: join(__dirname, 'templates'),
+          layoutsDir: join(__dirname, 'templates'),
+          defaultLayout: ''
+        },
+        viewPath: join(__dirname, 'templates'),
+        extName: '.hbs'
+      })
+    )
 
-      const mailOptions = {
-        from: this.configService.get<string>('SMTP_USER'),
-        to,
-        subject,
-        context: { context },
-        template
-      }
-
-      return this.transporter.sendMail(mailOptions)
-    } catch (e) {
-      Logger.error(e)
+    const mailOptions = {
+      from: this.configService.get<string>('SMTP_USER'),
+      to,
+      subject,
+      context: { context },
+      template
     }
+
+    return this.transporter.sendMail(mailOptions)
   }
 }
