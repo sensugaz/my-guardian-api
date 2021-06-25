@@ -8,7 +8,7 @@ import {
 } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ApiException, BookingStatusEnum, PaymentStatusEnum } from '@my-guardian-api/common'
-import { HttpStatus } from '@nestjs/common'
+import { HttpStatus, Logger } from '@nestjs/common'
 import { BookingModel } from '@my-guardian-api/database'
 import { MailerService } from '@my-guardian-api/mailer'
 import { ConfigService } from '@nestjs/config'
@@ -73,25 +73,33 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         })
 
         if (booking.qty == 1) {
-          await this.mailerService.sendWithTemplate(
-            user.email,
-            'New order solo offer',
-            {
-              url: `${this.configService.get('BACKOFFICE_URL')}/order/${booking.id}/detail`,
-              bookingId: booking.id
-            },
-            'solo-booking'
-          )
+          try {
+            await this.mailerService.sendWithTemplate(
+              user.email,
+              'New order solo offer',
+              {
+                url: `${this.configService.get('BACKOFFICE_URL')}/order/${booking.id}/detail`,
+                bookingId: booking.id
+              },
+              'solo-booking'
+            )
+          } catch (e) {
+            Logger.error(e)
+          }
         } else {
-          await this.mailerService.sendWithTemplate(
-            user.email,
-            'New order duo offer',
-            {
-              url: `${this.configService.get('BACKOFFICE_URL')}/order/${booking.id}/detail`,
-              bookingId: booking.id
-            },
-            'duo-booking'
-          )
+          try {
+            await this.mailerService.sendWithTemplate(
+              user.email,
+              'New order duo offer',
+              {
+                url: `${this.configService.get('BACKOFFICE_URL')}/order/${booking.id}/detail`,
+                bookingId: booking.id
+              },
+              'duo-booking'
+            )
+          } catch (e) {
+            Logger.error(e)
+          }
         }
         break
       case 'payment_intent.processing':
