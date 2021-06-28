@@ -17,17 +17,17 @@ export class MailerService {
       secure: true,
       auth: {
         user: configService.get<string>('SMTP_USER'),
-        pass: configService.get<string>('SMTP_PASS')
-      }
+        pass: configService.get<string>('SMTP_PASS'),
+      },
     })
   }
 
   send(to: string, subject: string, content: string): Promise<SentMessageInfo> {
     const mailOptions = {
-      from: this.configService.get<string>('SMTP_USER'),
+      from: 'contact@myguardian.fr',
       to,
       subject,
-      html: content
+      html: content,
     }
 
     return this.transporter.sendMail(mailOptions)
@@ -37,7 +37,7 @@ export class MailerService {
     to: string,
     subject: string,
     context: any,
-    template: string
+    template: string,
   ): Promise<SentMessageInfo> {
     this.transporter.use(
       'compile',
@@ -46,19 +46,19 @@ export class MailerService {
           extName: '.hbs',
           partialsDir: join(__dirname, 'templates'),
           layoutsDir: join(__dirname, 'templates'),
-          defaultLayout: ''
+          defaultLayout: '',
         },
         viewPath: join(__dirname, 'templates'),
-        extName: '.hbs'
-      })
+        extName: '.hbs',
+      }),
     )
 
     const mailOptions = {
-      from: this.configService.get<string>('SMTP_USER'),
+      from: 'contact@myguardian.fr',
       to,
       subject,
       context: { context },
-      template
+      template,
     }
 
     return this.transporter.sendMail(mailOptions)

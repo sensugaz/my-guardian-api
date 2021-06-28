@@ -53,78 +53,76 @@ export class NotificationService {
     const day = moment().format('dddd')
 
     for (const booking of bookings) {
-      if (booking.scheduleDay === day.toUpperCase()) {
-        const shopSchedule = await this.shopScheduleRepository.findOne({
-          where: {
-            day: booking.scheduleDay,
-            shop: {
-              id: booking.shop.id,
-            },
+      const shopSchedule = await this.shopScheduleRepository.findOne({
+        where: {
+          day: booking.scheduleDay,
+          shop: {
+            id: booking.shop.id,
           },
-        })
+        },
+      })
 
-        if (!shopSchedule.isClose) {
-          const start = moment()
-          const [scheduleCloseHour, scheduleCloseMinute] =
-            shopSchedule.closeTime.split(':')
-          const end = moment()
-            .hour(Number(scheduleCloseHour))
-            .minute(Number(scheduleCloseMinute))
-          const duration = moment.duration(end.diff(start))
-          const minute = duration.asMinutes()
+      if (!shopSchedule.isClose) {
+        const start = moment()
+        const [scheduleCloseHour, scheduleCloseMinute] =
+          shopSchedule.closeTime.split(':')
+        const end = moment()
+          .hour(Number(scheduleCloseHour))
+          .minute(Number(scheduleCloseMinute))
+        const duration = moment.duration(end.diff(start))
+        const minute = duration.asMinutes()
 
-          if (minute > 0) {
-            const user = await this.userRepository.findOne({
-              id: booking?.customer?.userId,
-            })
+        if (minute > 0) {
+          const user = await this.userRepository.findOne({
+            id: booking?.customer?.userId,
+          })
 
-            if (user && user.deviceId) {
-              if (Math.floor(minute) === 5) {
-                booking.setNotificationTime(start.format())
-                await this.bookingRepository.save(booking)
+          if (user && user.deviceId) {
+            if (Math.floor(minute) === 5) {
+              booking.setNotificationTime(start.format())
+              await this.bookingRepository.save(booking)
 
-                await this.fmc.send({
-                  to: user.deviceId,
-                  data: {
-                    bookingId: booking.id,
-                  },
-                  notification: {
-                    title: 'Retrait MyGuardian',
-                    body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.',
-                  },
-                })
-                Logger.debug('Fire Noti: 5')
-              } else if (Math.floor(minute) === 30) {
-                booking.setNotificationTime(start.format())
-                await this.bookingRepository.save(booking)
+              await this.fmc.send({
+                to: user.deviceId,
+                data: {
+                  bookingId: booking.id,
+                },
+                notification: {
+                  title: 'Retrait MyGuardian',
+                  body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.',
+                },
+              })
+              Logger.debug('Fire Noti: 5')
+            } else if (Math.floor(minute) === 30) {
+              booking.setNotificationTime(start.format())
+              await this.bookingRepository.save(booking)
 
-                await this.fmc.send({
-                  to: user.deviceId,
-                  data: {
-                    bookingId: booking.id,
-                  },
-                  notification: {
-                    title: 'Retrait MyGuardian',
-                    body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.',
-                  },
-                })
-                Logger.debug('Fire Noti: 30')
-              } else if (Math.floor(minute) === 60) {
-                booking.setNotificationTime(start.format())
-                await this.bookingRepository.save(booking)
+              await this.fmc.send({
+                to: user.deviceId,
+                data: {
+                  bookingId: booking.id,
+                },
+                notification: {
+                  title: 'Retrait MyGuardian',
+                  body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.',
+                },
+              })
+              Logger.debug('Fire Noti: 30')
+            } else if (Math.floor(minute) === 60) {
+              booking.setNotificationTime(start.format())
+              await this.bookingRepository.save(booking)
 
-                await this.fmc.send({
-                  to: user.deviceId,
-                  data: {
-                    bookingId: booking.id,
-                  },
-                  notification: {
-                    title: 'Retrait MyGuardian',
-                    body: "Votre commerçant ferme dans moins d'une heure. Pensez à retirer vos équipements.",
-                  },
-                })
-                Logger.debug('Fire Noti: 60')
-              }
+              await this.fmc.send({
+                to: user.deviceId,
+                data: {
+                  bookingId: booking.id,
+                },
+                notification: {
+                  title: 'Retrait MyGuardian',
+                  body: "Votre commerçant ferme dans moins d'une heure. Pensez à retirer vos équipements.",
+                },
+              })
+              Logger.debug('Fire Noti: 60')
             }
           }
         }
