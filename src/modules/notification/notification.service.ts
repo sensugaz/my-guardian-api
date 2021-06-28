@@ -55,7 +55,7 @@ export class NotificationService {
     for (const booking of bookings) {
       const shopSchedule = await this.shopScheduleRepository.findOne({
         where: {
-          day,
+          day: day.toUpperCase(),
           shop: {
             id: booking.shop.id,
           },
