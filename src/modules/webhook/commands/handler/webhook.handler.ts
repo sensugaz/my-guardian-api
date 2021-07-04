@@ -115,6 +115,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         break
       case 'charge.refunded':
         booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
+        booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
         break
     }
 
