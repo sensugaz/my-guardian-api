@@ -46,6 +46,7 @@ jobs:
           envkey_STRIPE_SECRET_API_KEY: ${{ secrets.STRIPE_SECRET_API_KEY }}
           envkey_STRIPE_SIGNING_SECRET: ${{ secrets.STRIPE_SIGNING_SECRET }}
           envkey_SERVER_KEY: ${{ secrets.SERVER_KEY }}
+          envkey_TZ: ${{ secrets.TZ }}
           directory: './'
           file_name: .env
 
