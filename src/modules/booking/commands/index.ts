@@ -1,3 +1,3 @@
-import { CheckoutHandler, DroppedHandler, WithdrawHandler } from './handler'
+import { CancelHandler, CheckoutHandler, DroppedHandler, WithdrawHandler } from './handler'
 
-export const CommandHandlers = [CheckoutHandler, DroppedHandler, WithdrawHandler]
+export const CommandHandlers = [CheckoutHandler, DroppedHandler, WithdrawHandler, CancelHandler]

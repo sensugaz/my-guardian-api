@@ -151,6 +151,9 @@ export class CheckoutHandler implements ICommandHandler<CheckoutCommand> {
       }
     })
 
+    booking.setPaymentIntent(paymentIntent.id)
+    await this.bookingRepository.save(booking)
+
     return {
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,

@@ -4,7 +4,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import * as useragent from 'express-useragent'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: false
+  })
 
   const config = new DocumentBuilder()
     .setTitle('my-guardian-api')
@@ -12,7 +14,7 @@ async function bootstrap() {
     .addBearerAuth({
       type: 'http',
       scheme: 'bearer',
-      bearerFormat: 'JWT',
+      bearerFormat: 'JWT'
     })
     .build()
 

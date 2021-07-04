@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common'
-import { StripeMiddleware } from '@my-guardian-api/common/middlewares'
 import { CommandHandlers } from './commands'
 import { WebhookController } from './controllers'
 import { StripeModule } from 'nestjs-stripe'
@@ -14,6 +13,7 @@ import {
   UserRepository,
   VoucherHistoryRepository
 } from '@my-guardian-api/database/repositories'
+import { WebhookMiddleware } from './middlewares'
 
 @Module({
   imports: [
@@ -41,7 +41,7 @@ import {
 })
 export class WebhookModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(StripeMiddleware)
+    consumer.apply(WebhookMiddleware)
       .forRoutes('/webhook')
   }
 }

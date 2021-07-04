@@ -3,17 +3,10 @@ import * as FCM from 'fcm-push'
 import { ConfigService } from '@nestjs/config'
 import { Cron } from '@nestjs/schedule'
 import { InjectRepository } from '@nestjs/typeorm'
-import {
-  BookingRepository,
-  ShopScheduleRepository,
-  UserRepository,
-} from '@my-guardian-api/database/repositories'
-import {
-  BookingBagStatusEnum,
-  BookingStatusEnum,
-} from '@my-guardian-api/common'
+import { BookingRepository, ShopScheduleRepository, UserRepository } from '@my-guardian-api/database/repositories'
+import { BookingBagStatusEnum, BookingStatusEnum } from '@my-guardian-api/common'
 import * as moment from 'moment-timezone'
-import { Brackets, IsNull, Not } from 'typeorm'
+import { Brackets } from 'typeorm'
 
 @Injectable()
 export class NotificationService {
@@ -26,10 +19,9 @@ export class NotificationService {
     @InjectRepository(BookingRepository)
     private readonly bookingRepository: BookingRepository,
     @InjectRepository(ShopScheduleRepository)
-    private readonly shopScheduleRepository: ShopScheduleRepository,
+    private readonly shopScheduleRepository: ShopScheduleRepository
   ) {
     this.fmc = new FCM(this.configService.get<string>('SERVER_KEY'))
-    moment.tz.setDefault('Europe/Paris')
   }
 
   @Cron('60 * * * * *')
@@ -39,14 +31,14 @@ export class NotificationService {
       .innerJoinAndSelect('bookings.customer', 'customer')
       .innerJoinAndSelect('bookings.shop', 'shop')
       .where('bookings.booking_status = :bookingStatus', {
-        bookingStatus: BookingStatusEnum.COMPLETED,
+        bookingStatus: BookingStatusEnum.COMPLETED
       })
       .andWhere(
         new Brackets((qb) => {
           qb.where('bookings.booking_bag_status = :bookingBagStatus', {
-            bookingBagStatus: BookingBagStatusEnum.DROPPED,
+            bookingBagStatus: BookingBagStatusEnum.DROPPED
           })
-        }),
+        })
       )
       .getMany()
 
@@ -57,12 +49,12 @@ export class NotificationService {
         where: {
           day: day.toUpperCase(),
           shop: {
-            id: booking.shop.id,
-          },
-        },
+            id: booking.shop.id
+          }
+        }
       })
 
-      if (!shopSchedule.isClose) {
+      if (shopSchedule && !shopSchedule.isClose) {
         const start = moment()
         const [scheduleCloseHour, scheduleCloseMinute] =
           shopSchedule.closeTime.split(':')
@@ -74,7 +66,7 @@ export class NotificationService {
 
         if (minute > 0) {
           const user = await this.userRepository.findOne({
-            id: booking?.customer?.userId,
+            id: booking?.customer?.userId
           })
 
           if (user && user.deviceId) {
@@ -85,12 +77,12 @@ export class NotificationService {
               await this.fmc.send({
                 to: user.deviceId,
                 data: {
-                  bookingId: booking.id,
+                  bookingId: booking.id
                 },
                 notification: {
                   title: 'Retrait MyGuardian',
-                  body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.',
-                },
+                  body: 'Votre commerçant ferme dans moins de 5 minutes. Pensez à retirer vos équipements.'
+                }
               })
               Logger.debug('Fire Noti: 5')
             } else if (Math.floor(minute) === 30) {
@@ -100,12 +92,12 @@ export class NotificationService {
               await this.fmc.send({
                 to: user.deviceId,
                 data: {
-                  bookingId: booking.id,
+                  bookingId: booking.id
                 },
                 notification: {
                   title: 'Retrait MyGuardian',
-                  body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.',
-                },
+                  body: 'Votre commerçant ferme dans moins de 30 minutes. Pensez à retirer vos équipements.'
+                }
               })
               Logger.debug('Fire Noti: 30')
             } else if (Math.floor(minute) === 60) {
@@ -115,12 +107,12 @@ export class NotificationService {
               await this.fmc.send({
                 to: user.deviceId,
                 data: {
-                  bookingId: booking.id,
+                  bookingId: booking.id
                 },
                 notification: {
                   title: 'Retrait MyGuardian',
-                  body: "Votre commerçant ferme dans moins d'une heure. Pensez à retirer vos équipements.",
-                },
+                  body: 'Votre commerçant ferme dans moins d\'une heure. Pensez à retirer vos équipements.'
+                }
               })
               Logger.debug('Fire Noti: 60')
             }

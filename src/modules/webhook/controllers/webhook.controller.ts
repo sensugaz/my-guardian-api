@@ -1,6 +1,7 @@
 import { ApiTags } from '@nestjs/swagger'
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Post, Req } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { Buffer } from 'buffer'
 import { WebhookCommand } from '../commands/command'
 
 @ApiTags('webhook')
@@ -11,7 +12,7 @@ export class WebhookController {
   }
 
   @Post()
-  index(@Body() body: any) {
+  index(@Req() req: any, @Body() body: Buffer) {
     return this.commandBus.execute(new WebhookCommand(body))
   }
 }

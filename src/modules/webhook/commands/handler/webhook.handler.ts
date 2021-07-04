@@ -42,7 +42,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
     if (!booking) {
       throw new ApiException({
         type: 'application',
-        module: 'user',
+        module: 'booking',
         codes: ['booking_not_found'],
         statusCode: HttpStatus.BAD_REQUEST
       })
@@ -112,6 +112,9 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
       case 'payment_intent.payment_failed':
         booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
         booking.updateBookingStatus(BookingStatusEnum.FAILED)
+        break
+      case 'charge.refunded':
+        booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
         break
     }
 

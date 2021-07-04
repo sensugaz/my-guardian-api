@@ -11,18 +11,19 @@ import { JwtService } from '@nestjs/jwt'
 export class LoginHandler implements ICommandHandler<LoginCommand> {
   constructor(
     private readonly entityManager: EntityManager,
-    private readonly jwtService: JwtService,
-  ) {}
+    private readonly jwtService: JwtService
+  ) {
+  }
 
   async execute({ body }: LoginCommand): Promise<{ accessToken: string }> {
     const user = await this.entityManager.findOne(UserModel, {
       email: body.email,
-      isActivate: true,
+      isActivate: true
     })
 
     const compare = await bcrypt.compareSync(
       body.password,
-      user?.password || '',
+      user?.password || ''
     )
 
     if (!compare) {
@@ -30,18 +31,16 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         type: 'application',
         module: 'user',
         codes: ['invalid_email_or_password'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
-
-    console.log(user)
-
+    
     const accessToken = await this.jwtService.sign({
       id: user.id,
       role: {
         key: user.role.key,
-        value: user.role.value,
-      },
+        value: user.role.value
+      }
     })
 
     return { accessToken }
