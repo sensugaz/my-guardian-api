@@ -7,6 +7,7 @@ import {
   BookingRepository,
   CustomerRepository,
   ShopRepository,
+  UserRepository,
 } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ApiException } from '@my-guardian-api/common'
@@ -25,6 +26,8 @@ export class CancelHandler implements ICommandHandler<CancelCommand> {
     private readonly customerRepository: CustomerRepository,
     @InjectRepository(ShopRepository)
     private readonly shopRepository: ShopRepository,
+    @InjectRepository(UserRepository)
+    private readonly userRepository: UserRepository,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
   ) {}
@@ -52,6 +55,10 @@ export class CancelHandler implements ICommandHandler<CancelCommand> {
         relations: ['shop', 'customer'],
       },
     )
+
+    const shop = await this.userRepository.findOne({
+      id: booking.shop.userId,
+    })
 
     if (!booking) {
       throw new ApiException({
@@ -99,8 +106,8 @@ export class CancelHandler implements ICommandHandler<CancelCommand> {
 
     try {
       await this.mailerService.sendWithTemplate(
-        user.email,
-        'Your booking was cancelled',
+        shop.email,
+        'Order cancelled',
         {
           url: `${this.configService.get('BACKOFFICE_URL')}/order/${
             booking.id
