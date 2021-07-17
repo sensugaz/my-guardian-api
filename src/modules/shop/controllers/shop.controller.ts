@@ -1,35 +1,21 @@
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { ShopModel, UserModel } from '@my-guardian-api/database'
+import { ShopBagModel, ShopModel, UserModel } from '@my-guardian-api/database'
 import {
+  CreateBagCommand,
   CreateShopCommand,
+  DeleteBagCommand,
   DeleteShopCommand,
-  UpdateShopCommand,
+  UpdateShopCommand
 } from '../commands/command'
 import { PaginationDto, RoleEnum } from '@my-guardian-api/common'
 import { Roles } from '@my-guardian-api/auth/decorators'
-import { CreateShopDto, SearchDto, UpdateShopDto } from '../dtos'
+import { CreateBagDto, CreateShopDto, SearchDto, UpdateShopDto } from '../dtos'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Pagination } from 'nestjs-typeorm-paginate'
-import {
-  GetShopByIdQuery,
-  GetShopQuery,
-  SearchShopQuery,
-} from '../queries/query'
+import { GetShopByIdQuery, GetShopQuery, SearchShopQuery } from '../queries/query'
 
 @ApiTags('shops')
 @Controller('/shops')
@@ -38,31 +24,32 @@ import {
 export class ShopController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-  ) {}
+    private readonly queryBus: QueryBus
+  ) {
+  }
 
   @Get()
   @ApiQuery({
     name: 'query',
-    required: false,
+    required: false
   })
   getShop(
     @Query('query') query: string,
-    @Query() param: PaginationDto,
+    @Query() param: PaginationDto
   ): Promise<Pagination<UserModel>> {
     const { page, limit, sort, orderBy } = param
     return this.queryBus.execute(
       new GetShopQuery(query, sort, orderBy, {
         page: page ? page : 1,
-        limit: limit > 100 ? 100 : limit,
-      }),
+        limit: limit > 100 ? 100 : limit
+      })
     )
   }
 
   @Get(':userId')
   @ApiParam({
     name: 'userId',
-    required: this,
+    required: this
   })
   getShopById(@Param('userId') userId: string): Promise<UserModel> {
     return this.queryBus.execute(new GetShopByIdQuery(userId))
@@ -78,12 +65,12 @@ export class ShopController {
   @Put(':userId')
   @ApiParam({
     name: 'userId',
-    required: this,
+    required: this
   })
   @HttpCode(HttpStatus.OK)
   updateShop(
     @Param('userId') id: string,
-    @Body() body: UpdateShopDto,
+    @Body() body: UpdateShopDto
   ): Promise<UserModel> {
     return this.commandBus.execute(new UpdateShopCommand(id, body))
   }
@@ -91,7 +78,7 @@ export class ShopController {
   @Delete(':userId')
   @ApiParam({
     name: 'userId',
-    required: this,
+    required: this
   })
   @Roles(RoleEnum.ADMIN)
   @HttpCode(HttpStatus.OK)
@@ -103,5 +90,34 @@ export class ShopController {
   @HttpCode(HttpStatus.OK)
   searchShop(@Body() body: SearchDto): Promise<ShopModel[]> {
     return this.queryBus.execute(new SearchShopQuery(body))
+  }
+
+  @Get(':userId/bags')
+  getBag(): Promise<ShopBagModel> {
+    return
+  }
+
+  @Get(':userId/bags/:bagId')
+  getBagById(): Promise<ShopBagModel> {
+    return
+  }
+
+  @Post(':userId/bags')
+  createBag(@Param('userId') userId: string, @Body() body: CreateBagDto): Promise<ShopModel> {
+    return this.commandBus.execute(new CreateBagCommand(userId, body))
+  }
+
+  @Delete(':userId/bags/:bagId')
+  @ApiParam({
+    name: 'userId',
+    required: this
+  })
+  @ApiParam({
+    name: 'bagId',
+    required: this
+  })
+  deleteBag(@Param('userId') userId: string,
+            @Param('bagId') bagId: string): Promise<ShopBagModel> {
+    return this.commandBus.execute(new DeleteBagCommand(userId, bagId))
   }
 }

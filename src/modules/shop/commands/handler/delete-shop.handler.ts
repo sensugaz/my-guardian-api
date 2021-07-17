@@ -1,18 +1,33 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { DeleteShopCommand } from '../command'
-import { EntityManager } from 'typeorm'
-import { ShopModel, UserModel, UserTokenModel } from '@my-guardian-api/database'
+import { UserModel } from '@my-guardian-api/database'
 import { ApiException } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import {
+  ShopPriceRepository,
+  ShopRepository,
+  ShopScheduleRepository,
+  UserRepository,
+  UserTokenRepository
+} from '@my-guardian-api/database/repositories'
 
 @CommandHandler(DeleteShopCommand)
 export class DeleteShopHandler implements ICommandHandler<DeleteShopCommand> {
-  constructor(private readonly entityManager: EntityManager) {
+  constructor(@InjectRepository(UserRepository)
+              private readonly userRepository: UserRepository,
+              @InjectRepository(UserTokenRepository)
+              private readonly userTokenRepository: UserTokenRepository,
+              @InjectRepository(ShopRepository)
+              private readonly shopRepository: ShopRepository,
+              @InjectRepository(ShopPriceRepository)
+              private readonly shopPriceRepository: ShopPriceRepository,
+              @InjectRepository(ShopScheduleRepository)
+              private readonly shopScheduleRepository: ShopScheduleRepository) {
   }
 
   async execute({ userId }: DeleteShopCommand): Promise<UserModel> {
-    const user = await this.entityManager.findOne(
-      UserModel,
+    const user = await this.userRepository.findOne(
       {
         id: userId
       },
@@ -30,7 +45,7 @@ export class DeleteShopHandler implements ICommandHandler<DeleteShopCommand> {
       })
     }
 
-    const shop = await this.entityManager.findOne(ShopModel, {
+    const shop = await this.shopRepository.findOne({
       userId: user.id
     })
 
@@ -43,12 +58,13 @@ export class DeleteShopHandler implements ICommandHandler<DeleteShopCommand> {
       })
     }
 
-    await this.entityManager.remove([...shop.schedules, ...shop.prices])
-    await this.entityManager.softRemove(shop)
-    await this.entityManager.delete(UserTokenModel, {
+    await this.shopPriceRepository.remove([...shop.prices])
+    await this.shopScheduleRepository.remove([...shop.schedules])
+    await this.shopRepository.softRemove(shop)
+    await this.userTokenRepository.delete({
       user: user
     })
-    await this.entityManager.remove(user)
+    await this.userRepository.remove(user)
 
     delete user.password
     delete user.salt

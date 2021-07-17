@@ -1,26 +1,31 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { SearchShopQuery } from '../query'
-import { ConfigModel, ShopModel } from '@my-guardian-api/database'
-import { EntityManager } from 'typeorm'
+import { ShopModel } from '@my-guardian-api/database'
 import { GoogleMapService } from '@my-guardian-api/google-map'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ConfigRepository, ShopRepository } from '@my-guardian-api/database/repositories'
 
 @QueryHandler(SearchShopQuery)
 export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
   constructor(
-    private readonly entityManager: EntityManager,
-    private readonly googleMapService: GoogleMapService,
-  ) {}
+    @InjectRepository(ConfigRepository)
+    private readonly configRepository: ConfigRepository,
+    @InjectRepository(ShopRepository)
+    private readonly shopRepository: ShopRepository,
+    private readonly googleMapService: GoogleMapService
+  ) {
+  }
 
   async execute({ body }: SearchShopQuery): Promise<ShopModel[]> {
-    const config = await this.entityManager.findOne(ConfigModel)
-    const shops = await this.entityManager.find(ShopModel)
+    const config = await this.configRepository.findOne()
+    const shops = await this.shopRepository.find()
     const shopInArea: ShopModel[] = []
 
     for (const shop of shops) {
       if (shop?.geolocation?.lat && shop?.geolocation?.lng) {
         const distance = await this.googleMapService.distance(
           body.geolocation,
-          shop.geolocation,
+          shop.geolocation
         )
 
         if (distance >= 0) {

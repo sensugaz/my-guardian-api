@@ -1,22 +1,31 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { UpdateShopCommand } from '../command'
-import {
-  ShopModel,
-  ShopPriceModel,
-  ShopScheduleModel,
-  UserModel,
-} from '@my-guardian-api/database'
-import { EntityManager } from 'typeorm'
+import { UserModel } from '@my-guardian-api/database'
 import { ApiException } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import {
+  ShopPriceRepository,
+  ShopRepository,
+  ShopScheduleRepository,
+  UserRepository
+} from '@my-guardian-api/database/repositories'
 
 @CommandHandler(UpdateShopCommand)
 export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(@InjectRepository(UserRepository)
+              private readonly userRepository: UserRepository,
+              @InjectRepository(ShopRepository)
+              private readonly shopRepository: ShopRepository,
+              @InjectRepository(ShopPriceRepository)
+              private readonly shopPriceRepository: ShopPriceRepository,
+              @InjectRepository(ShopScheduleRepository)
+              private readonly shopScheduleRepository: ShopScheduleRepository) {
+  }
 
   async execute({ userId, body }: UpdateShopCommand): Promise<UserModel> {
-    const user = await this.entityManager.findOne(UserModel, {
-      id: userId,
+    const user = await this.userRepository.findOne({
+      id: userId
     })
 
     if (!user) {
@@ -24,12 +33,12 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
         type: 'application',
         module: 'shop',
         codes: ['shop_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
-    let shop = await this.entityManager.findOne(ShopModel, {
-      userId: user.id,
+    let shop = await this.shopRepository.findOne({
+      userId: user.id
     })
 
     if (!shop) {
@@ -37,7 +46,7 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
         type: 'application',
         module: 'shop',
         codes: ['shop_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 
@@ -46,43 +55,43 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
       address: body.address,
       geolocation: body.geolocation,
       description: body.description,
-      available: body.available,
+      available: body.available
     })
 
     shop.clearSchedules()
     shop.clearPrices()
 
-    shop = await this.entityManager.save(shop)
+    shop = await this.shopRepository.save(shop)
 
-    await this.entityManager.delete(ShopPriceModel, {
-      shop: null,
+    await this.shopPriceRepository.delete({
+      shop: null
     })
-    await this.entityManager.delete(ShopScheduleModel, {
-      shop: null,
+    await this.shopScheduleRepository.delete({
+      shop: null
     })
 
     for (const schedule of body.schedules) {
-      const scheduleModel = this.entityManager.create(ShopScheduleModel, {
+      const scheduleModel = this.shopScheduleRepository.create({
         day: schedule.day,
         openTime: !schedule.isClose ? schedule.openTime : null,
         closeTime: !schedule.isClose ? schedule.closeTime : null,
-        isClose: schedule.isClose,
+        isClose: schedule.isClose
       })
 
       shop.addSchedule(scheduleModel)
     }
 
     for (const price of body.prices) {
-      const priceModel = this.entityManager.create(ShopPriceModel, {
+      const priceModel = this.shopPriceRepository.create({
         name: price.name,
         price: price.price,
-        qty: price.qty,
+        qty: price.qty
       })
 
       shop.addPrice(priceModel)
     }
 
-    shop = await this.entityManager.save(shop)
+    shop = await this.shopRepository.save(shop)
 
     user['profile'] = shop
 

@@ -1,3 +1,5 @@
 export * from './create-shop.handler'
 export * from './update-shop.handler'
 export * from './delete-shop.handler'
+export * from './create-bag.handler'
+export * from './delete-bag.handler'

@@ -3,6 +3,7 @@ import { BaseModel } from '@my-guardian-api/database/models/base.model'
 import { ShopScheduleModel } from '@my-guardian-api/database/models/shop-schedule.model'
 import { ShopPriceModel } from '@my-guardian-api/database/models/shop-price.model'
 import { BookingModel } from '@my-guardian-api/database/models/booking.model'
+import { ShopBagModel } from '@my-guardian-api/database/models/shop-bag.model'
 
 @Entity('shops')
 export class ShopModel extends BaseModel {
@@ -59,6 +60,12 @@ export class ShopModel extends BaseModel {
   })
   bookings: BookingModel[]
 
+  @OneToMany(() => ShopBagModel, (x) => x.shop, {
+    cascade: true,
+    eager: true
+  })
+  bags: ShopBagModel[]
+
   addSchedule(schedule: ShopScheduleModel) {
     if (!this.schedules) {
       this.schedules = []
@@ -73,6 +80,14 @@ export class ShopModel extends BaseModel {
     }
 
     this.prices.push(price)
+  }
+
+  addBag(bag: ShopBagModel) {
+    if (!this.bags) {
+      this.bags = []
+    }
+
+    this.bags.push(bag)
   }
 
   updateProfile(profile: {
@@ -95,6 +110,10 @@ export class ShopModel extends BaseModel {
 
   clearPrices() {
     this.prices = []
+  }
+
+  clearBag() {
+    this.bags = []
   }
 
   decAvailable(num: number) {

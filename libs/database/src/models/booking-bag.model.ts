@@ -6,7 +6,7 @@ import { BookingModel } from '@my-guardian-api/database/models/booking.model'
 export class BookingBagModel extends BaseModel {
   @ManyToOne(() => BookingModel, (x) => x.bags, { onDelete: 'CASCADE' })
   @JoinColumn({
-    name: 'booking_id',
+    name: 'booking_id'
   })
   booking: BookingModel
 
@@ -16,14 +16,14 @@ export class BookingBagModel extends BaseModel {
   @Column({
     type: 'timestamp without time zone',
     name: 'dropped_at',
-    nullable: true,
+    nullable: true
   })
   droppedAt: Date
 
   @Column({
     type: 'timestamp without time zone',
     name: 'withdraw_at',
-    nullable: true,
+    nullable: true
   })
   withdrawAt: Date
 

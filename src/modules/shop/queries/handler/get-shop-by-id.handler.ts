@@ -3,22 +3,24 @@ import { GetShopByIdQuery } from '../query'
 import { ShopModel, UserModel } from '@my-guardian-api/database'
 import { ApiException, RoleEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
-import { EntityManager } from 'typeorm'
+import { InjectRepository } from '@nestjs/typeorm'
+import { UserRepository } from '@my-guardian-api/database/repositories'
 
 @QueryHandler(GetShopByIdQuery)
 export class GetShopByIdHandler implements IQueryHandler<GetShopByIdQuery> {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(@InjectRepository(UserRepository)
+              private readonly userRepository: UserRepository) {
+  }
 
   async execute({ userId }: GetShopByIdQuery): Promise<UserModel> {
-    const result = await this.entityManager
-      .getRepository(UserModel)
+    const result = await this.userRepository
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.role', 'roles')
       .innerJoinAndMapOne(
         'users.profile',
         ShopModel,
         'shops',
-        'users.id = shops.user_id',
+        'users.id = shops.user_id'
       )
       .leftJoinAndSelect('shops.schedules', 'schedules')
       .leftJoinAndSelect('shops.prices', 'prices')
@@ -32,7 +34,7 @@ export class GetShopByIdHandler implements IQueryHandler<GetShopByIdQuery> {
         type: 'application',
         module: 'customer',
         codes: ['customer_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST
       })
     }
 

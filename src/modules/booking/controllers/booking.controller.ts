@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { CancelCommand, CheckoutCommand, DroppedCommand, WithdrawCommand } from '../commands/command'
+import { CancelledCommand, CheckoutCommand, DroppedCommand, WithdrawCommand } from '../commands/command'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Roles } from '@my-guardian-api/auth/decorators'
@@ -84,6 +84,6 @@ export class BookingController {
     required: this
   })
   cancelBooking(@Req() req, @Param('id') id: string): Promise<BookingModel> {
-    return this.commandBus.execute(new CancelCommand(req.user, id))
+    return this.commandBus.execute(new CancelledCommand(req.user, id))
   }
 }
