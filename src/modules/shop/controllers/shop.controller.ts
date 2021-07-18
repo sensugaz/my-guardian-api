@@ -15,7 +15,7 @@ import { CreateBagDto, CreateShopDto, SearchDto, UpdateShopDto } from '../dtos'
 import { AuthGuard } from '@nestjs/passport'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Pagination } from 'nestjs-typeorm-paginate'
-import { GetShopByIdQuery, GetShopQuery, SearchShopQuery } from '../queries/query'
+import { GetBagByIdQuery, GetBagQuery, GetShopByIdQuery, GetShopQuery, SearchShopQuery } from '../queries/query'
 
 @ApiTags('shops')
 @Controller('/shops')
@@ -93,16 +93,42 @@ export class ShopController {
   }
 
   @Get(':userId/bags')
-  getBag(): Promise<ShopBagModel> {
-    return
+  @ApiParam({
+    name: 'userId',
+    required: this
+  })
+  @ApiQuery({
+    name: 'query',
+    required: false
+  })
+  @Roles(RoleEnum.ADMIN, RoleEnum.SHOP)
+  getBag(@Param('userId') userId: string,
+         @Query('query') query: string,
+         @Query() param: PaginationDto): Promise<Pagination<ShopBagModel>> {
+    const { page, limit, sort, orderBy } = param
+    return this.queryBus.execute(new GetBagQuery(userId, query, sort, orderBy, {
+      page: page ? page : 1,
+      limit: limit > 100 ? 100 : limit
+    }))
   }
 
   @Get(':userId/bags/:bagId')
-  getBagById(): Promise<ShopBagModel> {
-    return
+  @ApiParam({
+    name: 'userId',
+    required: this
+  })
+  @ApiParam({
+    name: 'bagId',
+    required: this
+  })
+  @Roles(RoleEnum.ADMIN, RoleEnum.SHOP)
+  getBagById(@Param('userId') userId: string,
+             @Param('bagId') bagId: string): Promise<ShopBagModel> {
+    return this.queryBus.execute(new GetBagByIdQuery(userId, bagId))
   }
 
   @Post(':userId/bags')
+  @Roles(RoleEnum.ADMIN, RoleEnum.SHOP)
   createBag(@Param('userId') userId: string, @Body() body: CreateBagDto): Promise<ShopModel> {
     return this.commandBus.execute(new CreateBagCommand(userId, body))
   }
@@ -116,8 +142,10 @@ export class ShopController {
     name: 'bagId',
     required: this
   })
+  @Roles(RoleEnum.ADMIN, RoleEnum.SHOP)
   deleteBag(@Param('userId') userId: string,
             @Param('bagId') bagId: string): Promise<ShopBagModel> {
     return this.commandBus.execute(new DeleteBagCommand(userId, bagId))
   }
+
 }
