@@ -31,6 +31,8 @@ export class DroppedHandler implements ICommandHandler<DroppedCommand> {
     const booking = await this.bookingRepository.findOne({
       id: bookingId,
       customer: customer
+    }, {
+      relations: ['shop']
     })
 
     if (!booking) {
@@ -83,10 +85,22 @@ export class DroppedHandler implements ICommandHandler<DroppedCommand> {
           statusCode: HttpStatus.BAD_REQUEST
         })
       }
+    }
 
+    for (const bag of body.bags) {
+      const shopBag = await this.shopBagRepository.findOne({
+        shop: booking.shop,
+        number: bag
+      })
+      
       shopBag.setStatus(ShopBagStatusEnum.UNAVAILABLE)
 
       await this.shopBagRepository.save(shopBag)
+
+      booking.dropped(this.bookingBagRepository.create({
+        number: bag,
+        droppedAt: new Date()
+      }))
     }
 
     return await this.bookingRepository.save(booking)

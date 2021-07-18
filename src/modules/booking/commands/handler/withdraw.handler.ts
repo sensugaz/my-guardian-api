@@ -6,9 +6,10 @@ import {
   BookingBagRepository,
   BookingRepository,
   CustomerRepository,
+  ShopBagRepository,
   ShopRepository
 } from '@my-guardian-api/database/repositories'
-import { ApiException, BookingBagStatusEnum } from '@my-guardian-api/common'
+import { ApiException, BookingBagStatusEnum, ShopBagStatusEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 
 @CommandHandler(WithdrawCommand)
@@ -20,7 +21,9 @@ export class WithdrawHandler implements ICommandHandler<WithdrawCommand> {
               @InjectRepository(CustomerRepository)
               private readonly customerRepository: CustomerRepository,
               @InjectRepository(ShopRepository)
-              private readonly shopRepository: ShopRepository) {
+              private readonly shopRepository: ShopRepository,
+              @InjectRepository(ShopBagRepository)
+              private readonly shopBagRepository: ShopBagRepository) {
   }
 
   async execute({ user, bookingId }: WithdrawCommand): Promise<BookingModel> {
@@ -62,6 +65,17 @@ export class WithdrawHandler implements ICommandHandler<WithdrawCommand> {
     }
 
     await this.shopRepository.save(shop)
+
+    for (const bag of booking.bags) {
+      const shopBag = await this.shopBagRepository.findOne({
+        shop: booking.shop,
+        number: bag.number
+      })
+
+      shopBag.setStatus(ShopBagStatusEnum.AVAILABLE)
+
+      await this.shopBagRepository.save(shopBag)
+    }
 
     return await this.bookingRepository.save(booking)
   }

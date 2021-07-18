@@ -8,7 +8,7 @@ import {
   IsNumber,
   IsObject,
   IsOptional,
-  ValidateNested,
+  ValidateNested
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { DayEnum } from '@my-guardian-api/common'
@@ -42,6 +42,10 @@ class Schedule {
 
   // @IsNotEmpty()
   closeTime: string
+
+  openTimeEnd: string
+
+  closeTimeStart: string
 
   @IsNotEmpty()
   isClose: boolean
