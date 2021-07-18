@@ -75,8 +75,8 @@ export class UpdateShopHandler implements ICommandHandler<UpdateShopCommand> {
         day: schedule.day,
         openTime: !schedule.isClose ? schedule.openTime : null,
         closeTime: !schedule.isClose ? schedule.closeTime : null,
-        openTimeEnd: !schedule.openTimeEnd ? schedule.openTimeEnd : null,
-        closeTimeStart: !schedule.closeTimeStart ? schedule.closeTimeStart : null,
+        openTimeEnd: schedule.openTimeEnd,
+        closeTimeStart: schedule.closeTimeStart,
         isClose: schedule.isClose
       })
 
