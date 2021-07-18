@@ -2,8 +2,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { DroppedCommand } from '../command'
 import { BookingModel } from '@my-guardian-api/database'
 import { InjectRepository } from '@nestjs/typeorm'
-import { BookingBagRepository, BookingRepository, CustomerRepository } from '@my-guardian-api/database/repositories'
-import { ApiException, PaymentStatusEnum } from '@my-guardian-api/common'
+import {
+  BookingBagRepository,
+  BookingRepository,
+  CustomerRepository,
+  ShopBagRepository
+} from '@my-guardian-api/database/repositories'
+import { ApiException, PaymentStatusEnum, ShopBagStatusEnum } from '@my-guardian-api/common'
 import { HttpStatus } from '@nestjs/common'
 
 @CommandHandler(DroppedCommand)
@@ -13,7 +18,9 @@ export class DroppedHandler implements ICommandHandler<DroppedCommand> {
               @InjectRepository(BookingBagRepository)
               private readonly bookingBagRepository: BookingBagRepository,
               @InjectRepository(CustomerRepository)
-              private readonly customerRepository: CustomerRepository) {
+              private readonly customerRepository: CustomerRepository,
+              @InjectRepository(ShopBagRepository)
+              private readonly shopBagRepository: ShopBagRepository) {
   }
 
   async execute({ user, bookingId, body }: DroppedCommand): Promise<BookingModel> {
@@ -54,12 +61,34 @@ export class DroppedHandler implements ICommandHandler<DroppedCommand> {
     }
 
     for (const bag of body.bags) {
-      booking.dropped(this.bookingBagRepository.create({
-        number: bag,
-        droppedAt: new Date()
-      }))
+      const shopBag = await this.shopBagRepository.findOne({
+        shop: booking.shop,
+        number: bag
+      })
+
+      if (!shopBag) {
+        throw new ApiException({
+          type: 'application',
+          module: 'booking',
+          codes: ['bag_number_not_match'],
+          statusCode: HttpStatus.BAD_REQUEST
+        })
+      }
+
+      if (shopBag.status === ShopBagStatusEnum.UNAVAILABLE) {
+        throw new ApiException({
+          type: 'application',
+          module: 'booking',
+          codes: ['bag_number_not_available'],
+          statusCode: HttpStatus.BAD_REQUEST
+        })
+      }
+
+      shopBag.setStatus(ShopBagStatusEnum.UNAVAILABLE)
+
+      await this.shopBagRepository.save(shopBag)
     }
-    
+
     return await this.bookingRepository.save(booking)
   }
 }

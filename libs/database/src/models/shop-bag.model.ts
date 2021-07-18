@@ -10,10 +10,14 @@ export class ShopBagModel extends BaseModel {
     name: 'shop_id'
   })
   shop: ShopModel
-  
+
   @Column()
   number: string
 
   @Column()
   status: ShopBagStatusEnum
+
+  setStatus(status: ShopBagStatusEnum) {
+    this.status = status
+  }
 }

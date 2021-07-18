@@ -9,10 +9,11 @@ import {
   BookingBagRepository,
   BookingRepository,
   CustomerRepository,
+  ShopBagRepository,
   ShopRepository,
   UserRepository,
   VoucherHistoryRepository,
-  VoucherRepository,
+  VoucherRepository
 } from '@my-guardian-api/database/repositories'
 import { StripeModule } from 'nestjs-stripe'
 import { ConfigService } from '@nestjs/config'
@@ -33,20 +34,22 @@ import { FirebaseModule } from 'nestjs-firebase'
       VoucherHistoryRepository,
       ShopRepository,
       BookingBagRepository,
-      UserRepository,
+      ShopBagRepository,
+      UserRepository
     ]),
     FirebaseModule.forRoot({
-      googleApplicationCredential: `${process.cwd()}/firebase.spec.json`,
+      googleApplicationCredential: `${process.cwd()}/firebase.spec.json`
     }),
     StripeModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         apiKey: configService.get<string>('STRIPE_SECRET_API_KEY'),
-        apiVersion: '2020-08-27',
-      }),
-    }),
+        apiVersion: '2020-08-27'
+      })
+    })
   ],
   controllers: [BookingController],
-  providers: [...CommandHandlers, ...QueryHandlers],
+  providers: [...CommandHandlers, ...QueryHandlers]
 })
-export class BookingModule {}
+export class BookingModule {
+}
