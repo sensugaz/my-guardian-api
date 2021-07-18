@@ -70,7 +70,7 @@ export class DroppedHandler implements ICommandHandler<DroppedCommand> {
         throw new ApiException({
           type: 'application',
           module: 'booking',
-          codes: ['bag_number_not_match'],
+          codes: ['bag_number_invalid'],
           statusCode: HttpStatus.BAD_REQUEST
         })
       }
