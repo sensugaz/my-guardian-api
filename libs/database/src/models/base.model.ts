@@ -5,19 +5,19 @@ export class BaseModel {
   id: string
 
   @CreateDateColumn({
-    type: 'timestamp with time zone',
+    type: 'timestamp with local time zone',
     name: 'created_date'
   })
   createdDate: Date
 
   @UpdateDateColumn({
-    type: 'timestamp with time zone',
+    type: 'timestamp with local time zone',
     name: 'updated_date'
   })
   updatedDate: Date
 
   @DeleteDateColumn({
-    type: 'timestamp with time zone',
+    type: 'timestamp with local time zone',
     name: 'deleted_date'
   })
   deletedDate: Date
