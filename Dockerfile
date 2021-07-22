@@ -22,4 +22,6 @@ COPY --from=development /usr/src/app/.env /.dist
 
 EXPOSE 3000 3000
 
+ENV TZ=Europe/Paris
+
 CMD ["node", "dist/src/main"]
