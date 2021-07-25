@@ -1,4 +1,9 @@
-import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  CreateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 import * as moment from 'moment-timezone'
 
 export class BaseModel {
@@ -14,8 +19,8 @@ export class BaseModel {
       },
       from(value: Date): any {
         return value
-      }
-    }
+      },
+    },
   })
   createdDate: string
 
@@ -24,12 +29,12 @@ export class BaseModel {
     name: 'updated_date',
     transformer: {
       to(value: Date): any {
-        return moment().add(2, 'hours').toDate()
+        return moment(value).add(2, 'hours').toDate()
       },
       from(value: Date): any {
         return value
-      }
-    }
+      },
+    },
   })
   updatedDate: Date
 
@@ -41,13 +46,13 @@ export class BaseModel {
         if (value) {
           return moment().add(2, 'hours').toDate()
         }
-        
+
         return value
       },
       from(value: Date): any {
         return value
-      }
-    }
+      },
+    },
   })
   deletedDate: Date
 }
