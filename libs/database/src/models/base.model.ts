@@ -1,9 +1,4 @@
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm'
+import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import * as moment from 'moment-timezone'
 
 export class BaseModel {
@@ -11,20 +6,57 @@ export class BaseModel {
   id: string
 
   @CreateDateColumn({
-    type: 'timestamp with time zone',
+    type: 'timestamp without time zone',
     name: 'created_date',
+    transformer: {
+      to(value: any): any {
+        return value
+      },
+      from(value: any): any {
+        if (value) {
+          return moment(value).add(2, 'hours')
+        }
+
+        return value
+      }
+    }
   })
-  createdDate: string
+  createdDate: Date
 
   @UpdateDateColumn({
-    type: 'timestamp with time zone',
+    type: 'timestamp without time zone',
     name: 'updated_date',
+    nullable: true,
+    transformer: {
+      to(value: any): any {
+        return value
+      },
+      from(value: any): any {
+        if (value) {
+          return moment(value).add(2, 'hours')
+        }
+
+        return value
+      }
+    }
   })
   updatedDate: Date
 
   @DeleteDateColumn({
-    type: 'timestamp',
+    type: 'timestamp without time zone',
     name: 'deleted_date',
+    transformer: {
+      to(value: any): any {
+        return value
+      },
+      from(value: any): any {
+        if (value) {
+          return moment(value).add(2, 'hours')
+        }
+
+        return value
+      }
+    }
   })
   deletedDate: Date
 }
