@@ -15,7 +15,7 @@ export class BaseModel {
     name: 'created_date',
     transformer: {
       to(value: Date): any {
-        return moment().add(2, 'hours').toDate()
+        return moment(value).add(2, 'hours').toDate()
       },
       from(value: Date): any {
         return value
