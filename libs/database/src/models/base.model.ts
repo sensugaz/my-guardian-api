@@ -15,6 +15,9 @@ export class BaseModel {
     name: 'created_date',
     transformer: {
       to(value: Date): any {
+        if (!value) {
+          return moment().add(2, 'hours').toDate()
+        }
         return moment(value).add(2, 'hours').toDate()
       },
       from(value: Date): any {
@@ -29,6 +32,9 @@ export class BaseModel {
     name: 'updated_date',
     transformer: {
       to(value: Date): any {
+        if (!value) {
+          return moment().add(2, 'hours').toDate()
+        }
         return moment(value).add(2, 'hours').toDate()
       },
       from(value: Date): any {
