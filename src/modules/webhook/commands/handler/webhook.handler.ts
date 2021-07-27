@@ -121,13 +121,10 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         booking.updateBookingStatus(BookingStatusEnum.FAILED)
         break
       case 'charge.refunded':
-        {
-          booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
-          booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
-        }
+        booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
         break
     }
-    const resp = await this.bookingRepository.save(booking)
-    return resp
+
+    return await this.bookingRepository.save(booking)
   }
 }
