@@ -122,7 +122,11 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
         break
     }
-    
+
+    console.log('[booking] type ==> ', body.type)
+    console.log('[booking] updateBookingStatus ==> ', booking.bookingStatus)
+    console.log('[booking] updatePaymentStatus ==> ', booking.paymentStatus)
+
     return await this.bookingRepository.save(booking)
   }
 }
