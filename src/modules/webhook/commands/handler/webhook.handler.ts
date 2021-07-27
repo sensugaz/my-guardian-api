@@ -33,7 +33,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
   ) {}
 
   async execute({ body }: WebhookCommand): Promise<BookingModel> {
-    const booking = await this.bookingRepository.findOne(
+    let booking = await this.bookingRepository.findOne(
       {
         id: body.data?.object?.metadata?.bookingId,
       },
@@ -51,89 +51,154 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
       })
     }
 
-    switch (body.type) {
-      case 'payment_intent.succeeded':
-        booking.updatePaymentStatus(PaymentStatusEnum.PAID)
-        booking.updateBookingStatus(BookingStatusEnum.COMPLETED)
+    if (body.type === 'payment_intent.succeeded') {
+      booking.updatePaymentStatus(PaymentStatusEnum.PAID)
+      booking.updateBookingStatus(BookingStatusEnum.COMPLETED)
 
-        booking.shop.decAvailable(booking.qty)
+      booking.shop.decAvailable(booking.qty)
 
-        await this.shopRepository.save(booking.shop)
+      await this.shopRepository.save(booking.shop)
 
-        if (booking.voucherCode) {
-          await this.voucherHistoryRepository.save(
-            this.voucherHistoryRepository.create({
-              user: {
-                id: booking.customer.userId,
-              },
-              code: booking.voucherCode,
-            }),
+      if (booking.voucherCode) {
+        await this.voucherHistoryRepository.save(
+          this.voucherHistoryRepository.create({
+            user: {
+              id: booking.customer.userId,
+            },
+            code: booking.voucherCode,
+          }),
+        )
+      }
+
+      const user = await this.userRepository.findOne({
+        id: booking.shop.userId,
+      })
+
+      if (booking.qty == 1) {
+        try {
+          await this.mailerService.sendWithTemplate(
+            user.email,
+            'New order solo offer',
+            {
+              url: `${this.configService.get('BACKOFFICE_URL')}/order/${
+                booking.id
+              }/detail`,
+              bookingId: booking.id,
+            },
+            'solo-booking',
           )
+        } catch (e) {
+          Logger.error(e)
         }
-
-        const user = await this.userRepository.findOne({
-          id: booking.shop.userId,
-        })
-
-        if (booking.qty == 1) {
-          try {
-            await this.mailerService.sendWithTemplate(
-              user.email,
-              'New order solo offer',
-              {
-                url: `${this.configService.get('BACKOFFICE_URL')}/order/${
-                  booking.id
-                }/detail`,
-                bookingId: booking.id,
-              },
-              'solo-booking',
-            )
-          } catch (e) {
-            Logger.error(e)
-          }
-        } else {
-          try {
-            await this.mailerService.sendWithTemplate(
-              user.email,
-              'New order duo offer',
-              {
-                url: `${this.configService.get('BACKOFFICE_URL')}/order/${
-                  booking.id
-                }/detail`,
-                bookingId: booking.id,
-              },
-              'duo-booking',
-            )
-          } catch (e) {
-            Logger.error(e)
-          }
+      } else {
+        try {
+          await this.mailerService.sendWithTemplate(
+            user.email,
+            'New order duo offer',
+            {
+              url: `${this.configService.get('BACKOFFICE_URL')}/order/${
+                booking.id
+              }/detail`,
+              bookingId: booking.id,
+            },
+            'duo-booking',
+          )
+        } catch (e) {
+          Logger.error(e)
         }
-        break
-      case 'payment_intent.processing':
-        booking.updatePaymentStatus(PaymentStatusEnum.PROCESSING)
-        break
-      case 'payment_intent.canceled':
-        booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
-        booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
-        break
-      case 'payment_intent.payment_failed':
-        booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
-        booking.updateBookingStatus(BookingStatusEnum.FAILED)
-        break
-      case 'charge.refunded':
-        booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
-        booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
-        break
+      }
+    } else if (body.type === 'payment_intent.processing') {
+      booking.updatePaymentStatus(PaymentStatusEnum.PROCESSING)
+    } else if (body.type === 'payment_intent.canceled') {
+      booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
+      booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
+    } else if (body.type === 'payment_intent.payment_failed') {
+      booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
+      booking.updateBookingStatus(BookingStatusEnum.FAILED)
+    } else if (body.type === 'charge.refunded') {
+      booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
+      booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
     }
-    await this.bookingRepository.save(booking)
-    const newBooking = await this.bookingRepository.findOne(
-      {
-        id: booking.id,
-      },
-      {
-        relations: ['shop', 'customer'],
-      },
-    )
-    return newBooking
+
+    // switch (body.type) {
+    //   case 'payment_intent.succeeded':
+    //     booking.updatePaymentStatus(PaymentStatusEnum.PAID)
+    //     booking.updateBookingStatus(BookingStatusEnum.COMPLETED)
+
+    //     booking.shop.decAvailable(booking.qty)
+
+    //     await this.shopRepository.save(booking.shop)
+
+    //     if (booking.voucherCode) {
+    //       await this.voucherHistoryRepository.save(
+    //         this.voucherHistoryRepository.create({
+    //           user: {
+    //             id: booking.customer.userId,
+    //           },
+    //           code: booking.voucherCode,
+    //         }),
+    //       )
+    //     }
+
+    //     const user = await this.userRepository.findOne({
+    //       id: booking.shop.userId,
+    //     })
+
+    //     if (booking.qty == 1) {
+    //       try {
+    //         await this.mailerService.sendWithTemplate(
+    //           user.email,
+    //           'New order solo offer',
+    //           {
+    //             url: `${this.configService.get('BACKOFFICE_URL')}/order/${
+    //               booking.id
+    //             }/detail`,
+    //             bookingId: booking.id,
+    //           },
+    //           'solo-booking',
+    //         )
+    //       } catch (e) {
+    //         Logger.error(e)
+    //       }
+    //     } else {
+    //       try {
+    //         await this.mailerService.sendWithTemplate(
+    //           user.email,
+    //           'New order duo offer',
+    //           {
+    //             url: `${this.configService.get('BACKOFFICE_URL')}/order/${
+    //               booking.id
+    //             }/detail`,
+    //             bookingId: booking.id,
+    //           },
+    //           'duo-booking',
+    //         )
+    //       } catch (e) {
+    //         Logger.error(e)
+    //       }
+    //     }
+    //     break
+    //   case 'payment_intent.processing':
+    //     booking.updatePaymentStatus(PaymentStatusEnum.PROCESSING)
+    //     break
+    //   case 'payment_intent.canceled':
+    //     booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
+    //     booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
+    //     break
+    //   case 'payment_intent.payment_failed':
+    //     booking.updatePaymentStatus(PaymentStatusEnum.FAILED)
+    //     booking.updateBookingStatus(BookingStatusEnum.FAILED)
+    //     break
+    //   case 'charge.refunded':
+    //     booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
+    //     booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
+    //     break
+    // }
+
+    booking = await this.bookingRepository.save(booking)
+
+    console.log(booking)
+
+    return booking
   }
 }
