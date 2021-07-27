@@ -1,14 +1,13 @@
 import { ApiTags } from '@nestjs/swagger'
 import { Body, Controller, Post, Req } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import { CommandBus } from '@nestjs/cqrs'
 import { Buffer } from 'buffer'
 import { WebhookCommand } from '../commands/command'
 
 @ApiTags('webhook')
 @Controller('/webhook')
 export class WebhookController {
-  constructor(private readonly commandBus: CommandBus,
-              private readonly queryBus: QueryBus) {
+  constructor(private readonly commandBus: CommandBus) {
   }
 
   @Post()

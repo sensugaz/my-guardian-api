@@ -30,7 +30,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
   }
 
   async execute({ body }: WebhookCommand): Promise<BookingModel> {
-    const booking = await this.bookingRepository.findOne(
+    let booking = await this.bookingRepository.findOne(
       {
         id: body.data?.object?.metadata?.bookingId
       },
@@ -118,15 +118,15 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
         booking.updateBookingStatus(BookingStatusEnum.FAILED)
         break
       case 'charge.refunded':
-        booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
         booking.updatePaymentStatus(PaymentStatusEnum.REFUND)
+        booking.updateBookingStatus(BookingStatusEnum.CANCELLED)
         break
     }
 
-    console.log('[booking] type ==> ', body.type)
-    console.log('[booking] updateBookingStatus ==> ', booking.bookingStatus)
-    console.log('[booking] updatePaymentStatus ==> ', booking.paymentStatus)
+    booking = await this.bookingRepository.save(booking)
 
-    return await this.bookingRepository.save(booking)
+    console.log(booking)
+
+    return booking
   }
 }
