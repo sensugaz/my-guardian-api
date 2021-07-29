@@ -79,7 +79,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
           try {
             await this.mailerService.sendWithTemplate(
               user.email,
-              'New order solo offer',
+              'Nouvelle commande My Guardian',
               {
                 url: `${this.configService.get('BACKOFFICE_URL')}/order/${
                   booking.id
@@ -95,7 +95,7 @@ export class WebhookHandler implements ICommandHandler<WebhookCommand> {
           try {
             await this.mailerService.sendWithTemplate(
               user.email,
-              'New order duo offer',
+              'Nouvelle commande My Guardian',
               {
                 url: `${this.configService.get('BACKOFFICE_URL')}/order/${
                   booking.id
