@@ -10,7 +10,7 @@ import {
   Query,
   Redirect,
   Req,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
@@ -22,7 +22,7 @@ import {
   RegisterDto,
   ResetPasswordDto,
   UpdateDeviceDto,
-  UpdateProfileDto
+  UpdateProfileDto,
 } from '../dtos'
 import { UserModel, UserTokenModel } from '@my-guardian-api/database'
 import {
@@ -34,10 +34,14 @@ import {
   RegisterCommand,
   ResetPasswordCommand,
   UpdateDeviceIdCommand,
-  UpdateProfileCommand
+  UpdateProfileCommand,
 } from '../commands/command'
 import { AuthGuard } from '@nestjs/passport'
-import { CheckEmailQuery, CheckTokenQuery, ProfileQuery } from '../queries/query'
+import {
+  CheckEmailQuery,
+  CheckTokenQuery,
+  ProfileQuery,
+} from '../queries/query'
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Roles } from '@my-guardian-api/auth/decorators'
 import { ApiException, RoleEnum } from '@my-guardian-api/common'
@@ -47,9 +51,8 @@ import { ApiException, RoleEnum } from '@my-guardian-api/common'
 export class UserController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
-  ) {
-  }
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
@@ -66,7 +69,7 @@ export class UserController {
   @Get('/activate')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
   activate(@Query() token: ActivateDto): Promise<UserModel> {
     return this.commandBus.execute(new ActivateCommand(token))
@@ -81,11 +84,11 @@ export class UserController {
   @Post('/reset-password')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
   resetPassword(
     @Query() query: { token: string },
-    @Body() body: ResetPasswordDto
+    @Body() body: ResetPasswordDto,
   ): Promise<UserModel> {
     return this.commandBus.execute(new ResetPasswordCommand(query, body))
   }
@@ -104,7 +107,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   changePassword(
     @Req() req,
-    @Body() body: ChangePasswordDto
+    @Body() body: ChangePasswordDto,
   ): Promise<UserModel> {
     return this.commandBus.execute(new ChangePasswordCommand(req.user, body))
   }
@@ -125,7 +128,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   updateProfile(
     @Req() req,
-    @Body() body: UpdateProfileDto
+    @Body() body: UpdateProfileDto,
   ): Promise<UserModel> {
     return this.commandBus.execute(new UpdateProfileCommand(req.user, body))
   }
@@ -137,7 +140,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   updateDeviceId(
     @Req() req,
-    @Body() body: UpdateDeviceDto
+    @Body() body: UpdateDeviceDto,
   ): Promise<UserModel> {
     return this.commandBus.execute(new UpdateDeviceIdCommand(req.user, body))
   }
@@ -145,11 +148,11 @@ export class UserController {
   @Get('/redirect')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
   @ApiQuery({
     name: 'type',
-    required: true
+    required: true,
   })
   @Redirect('', HttpStatus.MOVED_PERMANENTLY)
   redirect(@Req() req, @Query() query: { type: string; token: string }) {
@@ -164,14 +167,14 @@ export class UserController {
         break
       case 'forgot-password':
         mobileUrl = `moto://ForgotPassword/${query.token}`
-        webUrl = `https://www.myguardian.fr/confirmation-de-compte?token=${query.token}`
+        webUrl = `https://moto-back-office-kalumdog.vercel.app/login?token=${query.token}`
         break
       default:
         throw new ApiException({
           type: 'application',
           module: 'user',
           codes: ['invalid_type'],
-          statusCode: HttpStatus.BAD_REQUEST
+          statusCode: HttpStatus.BAD_REQUEST,
         })
     }
     if (useragent.isMobile || useragent.isMobileNative) {
@@ -184,7 +187,7 @@ export class UserController {
   @Get('/check-token')
   @ApiQuery({
     name: 'token',
-    required: true
+    required: true,
   })
   checkToken(@Query('token') token: string): Promise<UserTokenModel> {
     return this.queryBus.execute(new CheckTokenQuery(token))
@@ -193,7 +196,7 @@ export class UserController {
   @Get('/check-email')
   @ApiQuery({
     name: 'email',
-    required: true
+    required: true,
   })
   checkEmail(@Query('email') email: string): Promise<{ exists: boolean }> {
     return this.queryBus.execute(new CheckEmailQuery(email))
