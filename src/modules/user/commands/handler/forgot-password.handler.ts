@@ -33,20 +33,11 @@ export class ForgotPasswordHandler
       },
     )
 
-    if (!user) {
+    if (!user || user.role.key === 'ADMIN') {
       throw new ApiException({
         type: 'application',
         module: 'user',
         codes: ['email_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST,
-      })
-    }
-
-    if (user.role.key === 'ADMIN') {
-      throw new ApiException({
-        type: 'application',
-        module: 'user',
-        codes: ['user_not_found'],
         statusCode: HttpStatus.BAD_REQUEST,
       })
     }
