@@ -11,26 +11,26 @@ import { ConfigService } from '@nestjs/config'
 
 @CommandHandler(ForgotPasswordCommand)
 export class ForgotPasswordHandler
-  implements ICommandHandler<ForgotPasswordCommand> {
+  implements ICommandHandler<ForgotPasswordCommand>
+{
   constructor(
     private readonly entityManager: EntityManager,
     private readonly mailerService: MailerService,
-    private readonly configService: ConfigService
-  ) {
-  }
+    private readonly configService: ConfigService,
+  ) {}
 
   async execute({ body }: ForgotPasswordCommand): Promise<UserModel> {
     const user = await this.entityManager.findOne(
       UserModel,
       {
-        email: body.email
+        email: body.email,
       },
       {
         order: {
-          createdDate: 'DESC'
+          createdDate: 'DESC',
         },
-        relations: ['tokens']
-      }
+        relations: ['tokens'],
+      },
     )
 
     if (!user) {
@@ -38,14 +38,23 @@ export class ForgotPasswordHandler
         type: 'application',
         module: 'user',
         codes: ['email_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
+      })
+    }
+
+    if (user.role.key === 'ADMIN') {
+      throw new ApiException({
+        type: 'application',
+        module: 'user',
+        codes: ['user_not_found'],
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
     const tokenEntity = this.entityManager.create(UserTokenModel, {
       token: uid(100),
       type: TokenTypeEnum.FORGOT_PASSWORD,
-      expiredDate: moment().utc().add(30, 'minute').toDate()
+      expiredDate: moment().utc().add(30, 'minute').toDate(),
     })
 
     user.addToken(tokenEntity)
@@ -57,10 +66,10 @@ export class ForgotPasswordHandler
         'Demande de réinitialisation du mot de passe',
         {
           url: `${this.configService.get<string>(
-            'BASE_URL'
-          )}/users/redirect?type=forgot-password&token=${tokenEntity.token}`
+            'BASE_URL',
+          )}/users/redirect?type=forgot-password&token=${tokenEntity.token}`,
         },
-        'forgot-password'
+        'forgot-password',
       )
     } catch (e) {
       Logger.error(e)
