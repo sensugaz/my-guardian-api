@@ -7,7 +7,7 @@ import {
   BookingRepository,
   CustomerRepository,
   ShopRepository,
-  UserRepository
+  UserRepository,
 } from '@my-guardian-api/database/repositories'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ApiException } from '@my-guardian-api/common'
@@ -30,13 +30,12 @@ export class CancelledHandler implements ICommandHandler<CancelledCommand> {
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
     private readonly mailerService: MailerService,
-    private readonly configService: ConfigService
-  ) {
-  }
+    private readonly configService: ConfigService,
+  ) {}
 
   async execute({ user, bookingId }: CancelledCommand): Promise<BookingModel> {
     const customer = await this.customerRepository.findOne({
-      userId: user.id
+      userId: user.id,
     })
 
     if (!customer) {
@@ -44,22 +43,22 @@ export class CancelledHandler implements ICommandHandler<CancelledCommand> {
         type: 'application',
         module: 'booking',
         codes: ['customer_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
     const booking = await this.bookingRepository.findOne(
       {
         id: bookingId,
-        customer: customer
+        customer: customer,
       },
       {
-        relations: ['shop', 'customer']
-      }
+        relations: ['shop', 'customer'],
+      },
     )
 
     const shop = await this.userRepository.findOne({
-      id: booking.shop.userId
+      id: booking.shop.userId,
     })
 
     if (!booking) {
@@ -67,7 +66,7 @@ export class CancelledHandler implements ICommandHandler<CancelledCommand> {
         type: 'application',
         module: 'booking',
         codes: ['booking_not_found'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
@@ -81,7 +80,7 @@ export class CancelledHandler implements ICommandHandler<CancelledCommand> {
         type: 'application',
         module: 'booking',
         codes: ['booking_cancelled_over_time'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
@@ -89,7 +88,7 @@ export class CancelledHandler implements ICommandHandler<CancelledCommand> {
 
     // refund
     const refund = await this.stripeClient.refunds.create({
-      payment_intent: booking.paymentIntent
+      payment_intent: booking.paymentIntent,
     })
 
     if (!refund) {
@@ -97,7 +96,7 @@ export class CancelledHandler implements ICommandHandler<CancelledCommand> {
         type: 'application',
         module: 'booking',
         codes: ['refund_failed'],
-        statusCode: HttpStatus.BAD_REQUEST
+        statusCode: HttpStatus.BAD_REQUEST,
       })
     }
 
@@ -109,14 +108,14 @@ export class CancelledHandler implements ICommandHandler<CancelledCommand> {
     try {
       await this.mailerService.sendWithTemplate(
         shop.email,
-        'Order cancelled',
+        'Réservation annulée',
         {
           url: `${this.configService.get('BACKOFFICE_URL')}/order/${
             booking.id
           }/detail`,
-          bookingId: booking.id
+          bookingId: booking.id,
         },
-        'cancel-booking'
+        'cancel-booking',
       )
     } catch (e) {
       Logger.error(e)
