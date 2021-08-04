@@ -45,6 +45,7 @@ import {
 import { RolesGuard } from '@my-guardian-api/auth'
 import { Roles } from '@my-guardian-api/auth/decorators'
 import { ApiException, RoleEnum } from '@my-guardian-api/common'
+import { ConfigService } from '@nestjs/config'
 
 @ApiTags('users')
 @Controller('/users')
@@ -52,6 +53,7 @@ export class UserController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('/login')
@@ -159,7 +161,6 @@ export class UserController {
     const useragent = req.useragent
     let mobileUrl,
       webUrl = null
-
     switch (query.type) {
       case 'register':
         mobileUrl = `moto://Login/${query.token}`
@@ -167,7 +168,9 @@ export class UserController {
         break
       case 'forgot-password':
         mobileUrl = `moto://ForgotPassword/${query.token}`
-        webUrl = `https://moto-back-office-kalumdog.vercel.app/login?token=${query.token}`
+        webUrl = `${this.configService.get('BACKOFFICE_URL')}/login?token=${
+          query.token
+        }`
         break
       default:
         throw new ApiException({
