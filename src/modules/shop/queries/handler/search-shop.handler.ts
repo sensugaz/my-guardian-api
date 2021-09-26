@@ -20,11 +20,11 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
     const config = await this.configRepository.findOne()
     let shops = await this.shopRepository.find()
     shops = shops.map(i => {
-      if (!i.geolocation?.lat && !i.geolocation?.lng) {
+      if (i?.geolocation?.lat && i?.geolocation?.lng) {
         return i
       }
     })
-    
+
     const shopInArea: ShopModel[] = []
 
     const destinations: { lat: string, lng: string }[] = shops.map(i => {
