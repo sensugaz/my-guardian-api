@@ -4,6 +4,8 @@ import { ShopModel } from '@my-guardian-api/database'
 import { GoogleMapService } from '@my-guardian-api/google-map'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ConfigRepository, ShopRepository } from '@my-guardian-api/database/repositories'
+import { IsNull, Not } from 'typeorm'
+import { ArrayUtil } from '@my-guardian-api/common'
 
 @QueryHandler(SearchShopQuery)
 export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
@@ -18,47 +20,51 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
 
   async execute({ body }: SearchShopQuery): Promise<ShopModel[]> {
     const config = await this.configRepository.findOne()
-    let shops = await this.shopRepository.find()
-    shops = shops.map(i => {
-      if (i?.geolocation?.lat && i?.geolocation?.lng) {
-        return i
+    const shops = await this.shopRepository.find({
+      where: {
+        geolocation: Not(IsNull())
       }
     })
 
     const shopInArea: ShopModel[] = []
 
-    const destinations: { lat: string, lng: string }[] = shops.map(i => {
-      if (i.geolocation?.lat && i.geolocation?.lng) {
-        return {
-          lat: i.geolocation.lat,
-          lng: i.geolocation.lng
+    const paginate = ArrayUtil.paginate(shops, 25)
+
+    for (const page in paginate.data) {
+      const shopPaginate = paginate.data[page]
+      const destinations: { lat: string, lng: string }[] = shopPaginate.map(i => {
+        if (i?.geolocation?.lat && i?.geolocation?.lng) {
+          return {
+            lat: i.geolocation.lat,
+            lng: i.geolocation.lng
+          }
         }
-      }
-    })
+      })
 
-    if (destinations.length > 0) {
-      const matrix = await this.googleMapService.distanceMatrix(
-        [body.geolocation],
-        [...destinations]
-      )
+      if (destinations.length > 0) {
+        const matrix = await this.googleMapService.distanceMatrix(
+          [body.geolocation],
+          [...destinations]
+        )
 
-      if (matrix.status === 'OK') {
-        if (matrix.rows.length > 0) {
-          matrix.rows[0].elements.forEach((value, index) => {
-            if (value.status === 'OK') {
-              const distance = value.distance?.value
+        if (matrix.status === 'OK') {
+          if (matrix.rows.length > 0) {
+            matrix.rows[0].elements.forEach((value, index) => {
+              if (value.status === 'OK') {
+                const distance = value.distance?.value
 
-              if (distance >= 0) {
-                const km = distance / 1000
-                const shop = shops[index]
+                if (distance >= 0) {
+                  const km = distance / 1000
+                  const shop = shops[index]
 
-                if (km < (config?.searchRadius || 10)) {
-                  shop['distance'] = Number(km.toFixed(2))
-                  shopInArea.push(shop)
+                  if (km < (config?.searchRadius || 10)) {
+                    shop['distance'] = Number(km.toFixed(2))
+                    shopInArea.push(shop)
+                  }
                 }
               }
-            }
-          })
+            })
+          }
         }
       }
     }
