@@ -1,5 +1,5 @@
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common'
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { ShopBagModel, ShopModel, UserModel } from '@my-guardian-api/database'
 import {
@@ -14,11 +14,13 @@ import { Roles } from '@my-guardian-api/auth/decorators'
 import { CreateBagDto, CreateShopDto, SearchDto, UpdateShopDto } from '../dtos'
 import { Pagination } from 'nestjs-typeorm-paginate'
 import { GetBagByIdQuery, GetBagQuery, GetShopByIdQuery, GetShopQuery, SearchShopQuery } from '../queries/query'
+import { AuthGuard } from '@nestjs/passport/dist/auth.guard'
+import { RolesGuard } from '@my-guardian-api/auth'
 
 @ApiTags('shops')
 @Controller('/shops')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard(['jwt']), RolesGuard)
+@ApiBearerAuth()
+@UseGuards(AuthGuard(['jwt']), RolesGuard)
 export class ShopController {
   constructor(
     private readonly commandBus: CommandBus,
