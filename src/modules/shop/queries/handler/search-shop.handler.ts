@@ -21,20 +21,38 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
     const shops = await this.shopRepository.find()
     const shopInArea: ShopModel[] = []
 
-    for (const shop of shops) {
-      if (shop?.geolocation?.lat && shop?.geolocation?.lng) {
-        const distance = await this.googleMapService.distance(
-          body.geolocation,
-          shop.geolocation
-        )
+    const destinations: { lat: string, lng: string }[] = shops.map(i => {
+      if (i.geolocation.lat && i.geolocation.lng) {
+        return {
+          lat: i.geolocation.lat,
+          lng: i.geolocation.lng
+        }
+      }
+    })
 
-        if (distance >= 0) {
-          const km = distance / 1000
+    if (destinations.length > 0) {
+      const matrix = await this.googleMapService.distanceMatrix(
+        [body.geolocation],
+        [...destinations]
+      )
 
-          if (km < (config?.searchRadius || 10)) {
-            shop['distance'] = Number(km.toFixed(2))
-            shopInArea.push(shop)
-          }
+      if (matrix.status === 'OK') {
+        if (matrix.rows.length > 0) {
+          matrix.rows[0].elements.forEach((value, index) => {
+            if (value.status === 'OK') {
+              const distance = value.distance?.value
+
+              if (distance >= 0) {
+                const km = distance / 1000
+                const shop = shops[index]
+
+                if (km < (config?.searchRadius || 10)) {
+                  shop['distance'] = Number(km.toFixed(2))
+                  shopInArea.push(shop)
+                }
+              }
+            }
+          })
         }
       }
     }

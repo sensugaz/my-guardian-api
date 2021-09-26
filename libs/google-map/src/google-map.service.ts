@@ -5,34 +5,36 @@ import { ConfigService } from '@nestjs/config'
 export class GoogleMapService {
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
-  ) {}
+    private readonly configService: ConfigService
+  ) {
+  }
 
-  async distance(
-    from: { lat: string; lng: string },
-    to: { lat: string; lng: string },
-  ): Promise<number> {
+  async distanceMatrix(origin: { lat: string, lng: string }[], destination: { lat: string, lng: string }[]): Promise<any> {
     const { data } = await this.httpService
       .get('https://maps.googleapis.com/maps/api/distancematrix/json', {
         params: {
           key: this.configService.get<string>('GOOGLE_MAP_API_KEY'),
           departure_time: 'now',
-          origins: `${from.lat},${from.lng}`,
-          destinations: `${to.lat},${to.lng}`,
-        },
+          origins: this.addressToString(origin),
+          destinations: this.addressToString(destination)
+        }
       })
       .toPromise()
 
-    let distance = 0
+    return data
+  }
 
-    if (data.status === 'OK') {
-      for (const row of data.rows) {
-        for (const element of row.elements) {
-          distance += element.distance?.value
-        }
+  private addressToString(addresses: { lat: string, lng: string }[]): string {
+    let addressString = ''
+
+    addresses.forEach((value, index) => {
+      if (index !== 0) {
+        addressString += '|'
       }
-    }
 
-    return distance
+      addressString += `${value.lat},${value.lng}`
+    })
+
+    return addressString
   }
 }
