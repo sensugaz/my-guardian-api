@@ -11,15 +11,19 @@ export class GoogleMapService {
 
   async distanceMatrix(origin: { lat: string, lng: string }[], destination: { lat: string, lng: string }[]): Promise<any> {
     const { data } = await this.httpService
-      .get('https://maps.googleapis.com/maps/api/distancematrix/json', {
+      .get('https://api.distancematrix.ai/maps/api/distancematrix/json', {
         params: {
-          key: this.configService.get<string>('GOOGLE_MAP_API_KEY'),
+          // key: this.configService.get<string>('GOOGLE_MAP_API_KEY'),
+          key: 'WwNmEk3q1Ac6b6WcgaAaDjMJczf0Z',
           departure_time: 'now',
           origins: this.addressToString(origin),
           destinations: this.addressToString(destination)
         }
       })
       .toPromise()
+
+    console.log(this.addressToString(origin))
+    console.log(this.addressToString(destination))
 
     return data
   }

@@ -5,7 +5,7 @@ import { GoogleMapService } from '@my-guardian-api/google-map'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ConfigRepository, ShopRepository } from '@my-guardian-api/database/repositories'
 import { IsNull, Not } from 'typeorm'
-import { ArrayUtil } from '@my-guardian-api/common'
+import getDistance from 'geolib/es/getDistance'
 
 @QueryHandler(SearchShopQuery)
 export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
@@ -28,46 +28,61 @@ export class SearchShopHandler implements IQueryHandler<SearchShopQuery> {
 
     const shopInArea: ShopModel[] = []
 
-    const paginate = ArrayUtil.paginate(shops, 25)
+    shops.forEach(shop => {
+      const distance = getDistance(
+        { latitude: body.geolocation.lat, longitude: body.geolocation.lng },
+        { latitude: shop.geolocation.lat, longitude: shop.geolocation.lng }
+      )
 
-    for (const page in paginate.data) {
-      const shopPaginate = paginate.data[page]
-      const destinations: { lat: string, lng: string }[] = shopPaginate.map(i => {
-        if (i?.geolocation?.lat && i?.geolocation?.lng) {
-          return {
-            lat: i.geolocation.lat,
-            lng: i.geolocation.lng
-          }
-        }
-      })
-
-      if (destinations.length > 0) {
-        const matrix = await this.googleMapService.distanceMatrix(
-          [body.geolocation],
-          [...destinations]
-        )
-
-        if (matrix.status === 'OK') {
-          if (matrix.rows.length > 0) {
-            matrix.rows[0].elements.forEach((value, index) => {
-              if (value.status === 'OK') {
-                const distance = value.distance?.value
-
-                if (distance >= 0) {
-                  const km = distance / 1000
-                  const shop = shops[index]
-
-                  if (km < (config?.searchRadius || 10)) {
-                    shop['distance'] = Number(km.toFixed(2))
-                    shopInArea.push(shop)
-                  }
-                }
-              }
-            })
-          }
+      if (distance > 0) {
+        const km = distance / 1000
+        if (km < (config?.searchRadius || 10)) {
+          shop['distance'] = Number(km.toFixed(2))
+          shopInArea.push(shop)
         }
       }
-    }
+    })
+
+    // const paginate = ArrayUtil.paginate(shops, 100)
+    //
+    // for (const page in paginate.data) {
+    //   const shopPaginate = paginate.data[page]
+    //   const destinations: { lat: string, lng: string }[] = shopPaginate.map(i => {
+    //     if (i?.geolocation?.lat && i?.geolocation?.lng) {
+    //       return {
+    //         lat: i.geolocation.lat,
+    //         lng: i.geolocation.lng
+    //       }
+    //     }
+    //   })
+    //
+    //   if (destinations.length > 0) {
+    //     const matrix = await this.googleMapService.distanceMatrix(
+    //       [body.geolocation],
+    //       [...destinations]
+    //     )
+    //
+    //     if (matrix.status === 'OK') {
+    //       if (matrix.rows.length > 0) {
+    //         matrix.rows[0].elements.forEach((value, index) => {
+    //           if (value.status === 'OK') {
+    //             const distance = value.distance?.value
+    //
+    //             if (distance >= 0) {
+    //               const km = distance / 1000
+    //               const shop = shops[index]
+    //
+    //               if (km < (config?.searchRadius || 10)) {
+    //                 shop['distance'] = Number(km.toFixed(2))
+    //                 shopInArea.push(shop)
+    //               }
+    //             }
+    //           }
+    //         })
+    //       }
+    //     }
+    //   }
+    // }
 
     return shopInArea
   }
