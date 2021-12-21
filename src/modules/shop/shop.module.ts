@@ -16,6 +16,7 @@ import {
   UserRepository,
   UserTokenRepository
 } from '@my-guardian-api/database/repositories'
+import { ShopService } from './shop.service'
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import {
     ])
   ],
   controllers: [ShopController],
-  providers: [...CommandHandlers, ...QueryHandlers]
+  providers: [...CommandHandlers, ...QueryHandlers, ShopService]
 })
 export class ShopModule {
 }

@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common'
+import { CacheInterceptor, CacheModule, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { CqrsModule } from '@nestjs/cqrs'
-import { APP_FILTER, APP_PIPE } from '@nestjs/core'
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core'
 import { ApiExceptionFilter } from '@my-guardian-api/common/filters'
 import { ValidationPipe } from '@my-guardian-api/common/pipes'
 
@@ -11,8 +11,15 @@ import { ValidationPipe } from '@my-guardian-api/common/pipes'
       isGlobal: true,
     }),
     CqrsModule,
+    CacheModule.register({
+      ttl: 5*60
+    }),
   ],
-  exports: [ConfigModule, CqrsModule],
+  exports: [
+    ConfigModule,
+    CqrsModule,
+    CacheModule
+  ],
   providers: [
     {
       provide: APP_PIPE,
@@ -21,6 +28,10 @@ import { ValidationPipe } from '@my-guardian-api/common/pipes'
     {
       provide: APP_FILTER,
       useClass: ApiExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
     },
   ],
 })
