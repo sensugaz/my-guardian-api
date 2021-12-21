@@ -26,6 +26,8 @@ export class ShopService {
       })
 
       await this.cacheManager.set('shops', data)
+
+      console.log('load data shops to cache')
     }
   }
 }

@@ -19,8 +19,8 @@ import { AuthGuard } from '@nestjs/passport'
 
 @ApiTags('shops')
 @Controller('/shops')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard(['jwt']), RolesGuard)
+@ApiBearerAuth()
+@UseGuards(AuthGuard(['jwt']), RolesGuard)
 export class ShopController {
   constructor(
     private readonly commandBus: CommandBus,
